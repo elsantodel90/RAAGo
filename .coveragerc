@@ -1,0 +1,5 @@
+[run]
+include = aago_ranking/*
+omit = *migrations*, *tests*
+plugins =
+    django_coverage_plugin
