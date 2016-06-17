@@ -61,3 +61,6 @@ aago_ranking/media/
 
 # MailHog binary
 mailhog
+
+# static files directory
+staticfiles
