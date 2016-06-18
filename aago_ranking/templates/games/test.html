@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block content %}
+Hello {{ name|default:"World" }}!!!
+<br>
+Values:
+
+<ul>
+{% for value in values %}
+<li>{{ value }}</li>
+{% endfor %}
+</ul>
+<br>
+
+<a href="{% url "games:test_2" "Nachin" %}">Link</a>
+  
+{% endblock content %}

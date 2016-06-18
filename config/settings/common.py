@@ -44,6 +44,7 @@ THIRD_PARTY_APPS = (
 # Apps specific for this project go here.
 LOCAL_APPS = (
     'aago_ranking.users',  # custom users app
+    'aago_ranking.games',
     # Your stuff: custom apps go here
 )
 

@@ -17,6 +17,7 @@ urlpatterns = [
 
     # User management
     url(r'^users/', include('aago_ranking.users.urls', namespace='users')),
+    url(r'^games/', include('aago_ranking.games.urls', namespace='games')),
     url(r'^accounts/', include('allauth.urls')),
 
     # Your stuff: custom urls includes go here
