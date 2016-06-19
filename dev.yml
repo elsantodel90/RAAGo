@@ -11,19 +11,18 @@ services:
     ports:
       - "5432:5432"
 
-  django:
-    build:
-      context: .
-      dockerfile: ./compose/django/Dockerfile-dev
-    command: python /app/manage.py runserver_plus 0.0.0.0:8000
-    depends_on:
-      - postgres
-    environment:
-      - POSTGRES_USER=aago_ranking
-    volumes:
-      - .:/app
-    ports:
-      - "8000:8000"
-    links:
-      - postgres
-
+#  django:
+#    build:
+#      context: .
+#      dockerfile: ./compose/django/Dockerfile-dev
+#    command: python /app/manage.py runserver_plus 0.0.0.0:8000
+#    depends_on:
+#      - postgres
+#    environment:
+#      - POSTGRES_USER=aago_ranking
+#    volumes:
+#      - .:/app
+#    ports:
+#      - "8000:8000"
+#    links:
+#      - postgres
