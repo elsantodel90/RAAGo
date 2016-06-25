@@ -122,6 +122,7 @@ void readGamesInformation(collection &tournamentCollection) {
         string winner;
         game g;
         lineInput >> g.white >> g.black >> g.handicap >> g.komi >> winner;
+        g.komi++; // Ajuste porque el modelo esta ajustado con reglas chinas, y usamos japonesas.
                 
 		if (winner == "WHITE")
 			g.whiteWins = true;
