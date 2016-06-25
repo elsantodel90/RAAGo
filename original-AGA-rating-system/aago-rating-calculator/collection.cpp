@@ -584,7 +584,7 @@ void collection::initSeeding(map<int, tdListEntry> &tdList) {
 			// We don't let players demote themselves
 			if (deltaR < 0) {
 				It->second.seed = tdListIt->second.rating;
-				int dayCount = boost::gregorian::date_period(tdListIt->second.lastRatingDate, tournamentDate).length().days();	
+				double dayCount = tdListIt->second.ratingAgeInDays;	
 				It->second.sigma = sqrt(tdListIt->second.sigma * tdListIt->second.sigma + 0.0005 * 0.0005 * dayCount * dayCount);	
 			}						
 			// Is this a self promotion by more than three stones?
@@ -602,7 +602,7 @@ void collection::initSeeding(map<int, tdListEntry> &tdList) {
 			}
 			else {
 				It->second.seed  = tdListIt->second.rating;
-				int dayCount = boost::gregorian::date_period(tdListIt->second.lastRatingDate, tournamentDate).length().days();
+				double dayCount = tdListIt->second.ratingAgeInDays;	
 				It->second.sigma = sqrt(tdListIt->second.sigma * tdListIt->second.sigma + 0.0005 * 0.0005 * dayCount * dayCount);	
 			}
 		}
@@ -644,8 +644,8 @@ void collection::findImprobables(map<int, tdListEntry> &tdList) {
 		}
 		
 		if (p<0.01) {
-			cout << "\tWhite: " << tdList[gameIt->white].name << " (" << gameIt->white << "), Rating = " << playerHash[gameIt->white].seed << endl;
-			cout << "\tBlack: " << tdList[gameIt->black].name << " (" << gameIt->black << "), Rating = " << playerHash[gameIt->black].seed << endl;
+			cout << "\tWhite: " << tdList[gameIt->white].id << " (" << gameIt->white << "), Rating = " << playerHash[gameIt->white].seed << endl;
+			cout << "\tBlack: " << tdList[gameIt->black].id << " (" << gameIt->black << "), Rating = " << playerHash[gameIt->black].seed << endl;
 			cout << "\tH/K: " << gameIt->handicap << "/" << gameIt->komi << endl;
 			cout << "\tResult: " << (gameIt->whiteWins ? "White wins" : "Black wins") << endl;
 			cout << "\tProb: " << p << endl;

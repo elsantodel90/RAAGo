@@ -6,35 +6,24 @@
 #   - GNU Scientific Library
 #   - Boost Library 
 
-LIBS=-lm -lgsl -lgslcblas -lmysqlpp -lboost_date_time
+LIBS=-lm -lgsl -lgslcblas
 INC=-I/usr/include/mysql
 FLAGS=-O2 -Wall -Wextra -Wshadow
 
-all: bayrate singlerate check
+all: bayrate
 
-bayrate: bayrate.cpp db.o collection.o game.o player.o
-	g++ $(FLAGS) db.o collection.o game.o bayrate.cpp player.o $(INC) $(LIBS) -o bayrate
+bayrate: bayrate.cpp collection.o game.o player.o
+	g++ $(FLAGS) collection.o game.o bayrate.cpp player.o $(INC) $(LIBS) -o bayrate
 
-singlerate: singlerate.cpp db.o collection.o game.o player.o
-	g++ $(FLAGS) db.o collection.o game.o singlerate.cpp player.o $(INC) $(LIBS) -o singlerate
-
-check: check.cpp db.o collection.o game.o player.o
-	g++ $(FLAGS) db.o collection.o game.o check.cpp player.o $(INC) $(LIBS) -o check
-
-db.o: db.cpp
-	g++ $(FLAGS) -c db.cpp -o db.o $(INC) $(LIBS)
-	
-game.o: game.cpp
+game.o: game.cpp game.h
 	g++ $(FLAGS) -c game.cpp -o game.o $(INC) $(LIBS)
 
-player.o: player.cpp
+player.o: player.cpp player.h
 	g++ $(FLAGS) -c player.cpp -o player.o $(INC) $(LIBS)
 
-collection.o: collection.cpp
+collection.o: collection.cpp collection.h
 	g++ $(FLAGS) -c collection.cpp -o collection.o $(INC) $(LIBS)
 
 clean:
 	rm *.o
 	rm bayrate
-	rm singlerate
-	rm check

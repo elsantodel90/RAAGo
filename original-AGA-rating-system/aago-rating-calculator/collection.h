@@ -40,11 +40,9 @@ class collection
 public:
 	collection(void);
 	~collection(void);
-	string tournamentCode;
 	map<int, player> playerHash;
 	vector<game> gameList;
 	std::string tournamentName;
-	boost::gregorian::date tournamentDate;
 	
 	double calc_pt(const gsl_vector *v);
 	double calc_pt_df(const gsl_vector *x, gsl_vector *df);

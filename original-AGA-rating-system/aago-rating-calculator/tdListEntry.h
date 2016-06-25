@@ -21,9 +21,6 @@
 
 #pragma once
 
-#include <string>
-#include <boost/date_time/gregorian/gregorian.hpp>
-
 class tdListEntry {
 public:
 	tdListEntry() {};
@@ -31,7 +28,6 @@ public:
 	int id;
 	double rating;
 	double sigma;
-	std::string name;
-	boost::gregorian::date lastRatingDate;
+    double ratingAgeInDays;
 	bool ratingUpdated;
 };

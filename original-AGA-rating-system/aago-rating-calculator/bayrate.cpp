@@ -21,100 +21,152 @@
 
 #include <iostream>
 #include <string>
+#include <sstream>
 #include <vector>
+#include <map>
 #include <algorithm>
-#include <mysql++/mysql++.h>
-#include <boost/date_time/gregorian/gregorian.hpp>
-#include "db.h"
+#include <cassert>
 #include "tdListEntry.h"
 #include "collection.h"
 
 using namespace std;
-using namespace boost::gregorian;
 
-int main(int argc, char *argv[])
-{
-	
- 	databaseConnection db;
- 	vector<string> tournamentUpdateList;	// The list of tournaments after the tournamentCascadeDate
-	boost::gregorian::date tournamentCascadeDate;		
+// trim from start (in place)
+static inline void ltrim(std::string &s) {
+    s.erase(s.begin(), std::find_if(s.begin(), s.end(), std::not1(std::ptr_fun<int, int>(std::isspace))));
+}
+
+// trim from end (in place)
+static inline void rtrim(std::string &s) {
+    s.erase(std::find_if(s.rbegin(), s.rend(), std::not1(std::ptr_fun<int, int>(std::isspace))).base(), s.end());
+}
+
+// trim from both ends (in place)
+static inline void trim(std::string &s) {
+    ltrim(s);
+    rtrim(s);
+}
+
+string nextLine() {
+    string line;
+    getline(cin, line);
+    trim(line);
+    return line;
+}
+
+class BadRank : public exception {};
+
+double parseRank(const string &category) {
+    istringstream ss(category);
+    int rankPartNumber; char rankPartKyuDan;
+    ss >> rankPartNumber >> rankPartKyuDan;
+
+    if  ( (rankPartKyuDan == 'k') || (rankPartKyuDan == 'K') )
+        return -(rankPartNumber+0.5);
+    else if  ( (rankPartKyuDan == 'd') || (rankPartKyuDan == 'd') )
+        return rankPartNumber+0.5;
+    else
+        throw BadRank();
+}
+
+double stringToDouble(const string &s) {
+    double ret; istringstream(s) >> ret;
+    return ret;
+}
+
+void readPlayersInformation(map<int, tdListEntry> &tdList, collection &tournamentCollection) {
+    string line = nextLine();
+    assert(line == "PLAYERS");
+	while (line = nextLine() , line != "END_PLAYERS") {
+        istringstream lineInput(line);
+        
+        int playerId; string category;
+        string previousRatingMuString , previousRatingSigmaString, previousRatingAgeInDaysString;
+        lineInput >> playerId >> category >> previousRatingMuString >> previousRatingSigmaString >> previousRatingAgeInDaysString;
+        const string NULL_STRING = "NULL";
+        if (previousRatingMuString == NULL_STRING) {
+            assert(previousRatingSigmaString == NULL_STRING);
+            assert(previousRatingAgeInDaysString == NULL_STRING);
+        }
+        else {
+            assert(previousRatingSigmaString != NULL_STRING);
+            assert(previousRatingAgeInDaysString != NULL_STRING);
+            tdListEntry entry;
+            entry.id               = playerId;            
+            entry.rating           = stringToDouble(previousRatingMuString);
+            entry.sigma            = stringToDouble(previousRatingSigmaString);
+            entry.ratingAgeInDays  = stringToDouble(previousRatingAgeInDaysString);
+            entry.ratingUpdated    = false;
+            tdList[entry.id] = entry;
+        }
+        
+        player p;
+        p.id = playerId;
+        try {
+            p.seed = parseRank(category);
+        }
+        catch (BadRank &) {
+            cerr << "Player " << playerId << " has invalid rank: " << category << endl;
+            exit(1);
+        }
+        tournamentCollection.playerHash[p.id] = p;
+	}
+}
+
+
+void readGamesInformation(collection &tournamentCollection) {
+    string line = nextLine();
+    assert(line == "GAMES");
+	while (line = nextLine() , line != "END_GAMES") {
+        istringstream lineInput(line);
+        string winner;
+        game g;
+        lineInput >> g.white >> g.black >> g.handicap >> g.komi >> winner;
+                
+		if (winner == "WHITE")
+			g.whiteWins = true;
+		else if (winner == "BLACK")
+			g.whiteWins = false;
+		else {
+			cerr << "Fatal error: unknown game winner " << winner << endl;
+			exit (1);
+		}
+				
+		tournamentCollection.gameList.push_back(g);
+        
+        assert(tournamentCollection.playerHash.find(g.white) != tournamentCollection.playerHash.end());
+        assert(tournamentCollection.playerHash.find(g.black) != tournamentCollection.playerHash.end());
+    }
+}
+
+int main()
+{	
  	map<int, tdListEntry> tdList;
  	map<string, bool> argList;
  	collection c;
-
-	for (int i=1; i<argc; i++) 
-		argList[string(argv[i])] = true;
-
- 	// Establish the database connection			
-	if ( !db.makeConnection() ) {	
-		std::cerr << "Fatal error:  db.makeConnection() failed." << std::endl;
-		exit (1);
-	}
-
-	db.excludeBogusGameData();
-
-	// Figure out which tournaments need rating
-	if ( !db.getTournamentUpdateList(tournamentUpdateList, tournamentCascadeDate) ) {
-		std::cerr << "Fatal error: db.getTournamentUpdateList() failed." << std::endl;
-		exit(1);
-	}
+		
+	readPlayersInformation(tdList, c);
+    readGamesInformation(c);
 	
-	if (tournamentUpdateList.size() == 0) {
-		cout << "No tournaments to update." << endl;
-		exit(1);
-	}	
-	else {
-		cout << "Updating all tournaments after " << to_iso_extended_string(tournamentCascadeDate) << endl;
-	}
-	
-	// Get the TDList immediately prior to the earliest unrated game
-	if (!db.getTDList(tournamentCascadeDate, tdList)) {
-		std::cerr << "Fatal error: db.getTDList() failed." << std::endl;
-		exit(1);
-	}
-	else {
-		cout << "Downloaded TDList" << endl;
-	}
-	
-	for (vector<string>::iterator It=tournamentUpdateList.begin(); It!=tournamentUpdateList.end(); It++) {
-		cout << "Processing " << *It << endl;
-		
-		c.reset();	
-		db.getTournamentInfo(*It, c);
-
-		if (c.gameList.size() == 0)
-			continue;
-		
-		c.initSeeding(tdList);
-		
-		// Start with the fast rating algorithm.  If it fails, then go for the simplex method as a backup. 
-		if (c.calc_ratings_fdf() != 0) {
-			if (c.calc_ratings() != 0) {
-				cerr << "Fatal error processing tournament " << *It << endl;
-				exit(1); 
-			}	
-		}
-		
-		// Copy the new ratings into the internal TDList for the next tournament update
-		for (map<int, player>::iterator It = c.playerHash.begin(); It != c.playerHash.end(); It++) {
-			tdList[It->second.id].id     = It->second.id;			
-			tdList[It->second.id].rating = It->second.rating;
-			tdList[It->second.id].sigma  = It->second.sigma;
-			tdList[It->second.id].lastRatingDate = c.tournamentDate;
-			tdList[It->second.id].ratingUpdated = true;
-		
-			cout << It->second.id << '\t' << It->second.rating << '\t' << It->second.sigma << endl;
-		}				
-	    cout << endl;
-	    
-		// Update database
-		if (argList.find(string("--commit")) != argList.end()) {
-			cout << "Committing results to database...";		
-			db.syncNewRatings(c);		
-			cout << "done." << endl;
-		}
-	}
-	cout << "Done ratings" << endl;
+    if (!c.gameList.empty()) {
+        c.initSeeding(tdList);
+        
+        // Start with the fast rating algorithm.  If it fails, then go for the simplex method as a backup. 
+        if (c.calc_ratings_fdf() != 0) {
+            if (c.calc_ratings() != 0) {
+                cerr << "Fatal error processing tournament" << endl;
+                exit(1); 
+            }
+        }
+        
+        // Copy the new ratings into the internal TDList for the next tournament update
+        for (map<int, player>::iterator It = c.playerHash.begin(); It != c.playerHash.end(); It++) {
+            tdList[It->second.id].id     = It->second.id;			
+            tdList[It->second.id].rating = It->second.rating;
+            tdList[It->second.id].sigma  = It->second.sigma;
+            tdList[It->second.id].ratingUpdated = true;
+        }
+    }
 	
 	for (map<int, tdListEntry>::iterator tdListIt = tdList.begin(); tdListIt != tdList.end(); tdListIt++) {
 		if (tdListIt->second.ratingUpdated)
