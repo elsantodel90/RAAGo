@@ -1,17 +1,46 @@
 from django.db import models
+from django.db.models import Q
+from django.utils.translation import ugettext_lazy as _
 
 from model_utils.models import TimeStampedModel
 
 
-class Player(TimeStampedModel, models.Model):
+class Player(TimeStampedModel):
     name = models.CharField(max_length=255)
 
+    def all_games(self):
+        return Game.objects.filter(Q(black_player=self) | Q(white_player=self))
+
     def __unicode__(self):
-        return "Player: {s.name}".format(s=self)
+        return self.name
 
 
-class Game(TimeStampedModel, models.Model):
-    white_player = models.ForeignKey('Player', db_index=True)
+_RESULT_CHOICES = (
+    ('black', _('Black Wins')),
+    ('white', _('White Wins')),
+    ('draw', _('Draw')),
+)
+
+_WIN_REASON_CHOICES = (
+    ('points', _('Points')),
+    ('resignation', _('Resignation')),
+    ('walkover', _('Walkover')),
+)
+
+
+class Game(TimeStampedModel):
+    white_player = models.ForeignKey('Player',
+                                     db_index=True,
+                                     related_name='games_as_white')
+    black_player = models.ForeignKey('Player',
+                                     db_index=True,
+                                     related_name='games_as_black')
+    handicap = models.IntegerField()
+    komi = models.DecimalField(max_digits=10, decimal_places=1)
+    result = models.CharField(max_length=16, choices=_RESULT_CHOICES)
+    win_reason = models.CharField(max_length=16, choices=_WIN_REASON_CHOICES)
+    points = models.DecimalField(max_digits=10, decimal_places=1)
+
     date = models.DateField(db_index=True)
 
     class Meta(object):  # pylint: disable=too-few-public-methods
@@ -19,4 +48,4 @@ class Game(TimeStampedModel, models.Model):
         verbose_name_plural = 'games'
 
     def __unicode__(self):
-        return u"Game: {s.date}".format(s=self)
+        return u"{s.white_player} vs {s.black_player} ({s.date})".format(s=self)
