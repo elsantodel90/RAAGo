@@ -1,10 +1,7 @@
 # Makefile for BayRate
 #
 # Program requires the following libraries:
-#   - MySql development libraries
-#   - MySql++ library
 #   - GNU Scientific Library
-#   - Boost Library 
 
 LIBS=-lm -lgsl -lgslcblas
 INC=-I/usr/include/mysql

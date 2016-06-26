@@ -374,12 +374,13 @@ int collection::calc_ratings() {
 		size = gsl_multimin_fminimizer_size (s);
 		status = gsl_multimin_test_size (size, 0.00001);
 
-		cout << "Iteration " << iter << "\tf() = " << s->fval << "\tsimplex size = " << size << endl;
+		//cout << "Iteration " << iter << "\tf() = " << s->fval << "\tsimplex size = " << size << endl;
 	} while ( (status == GSL_CONTINUE) && ( iter <= 1000000) );
 
 
-	if (status == GSL_SUCCESS)
-		cout << endl << "Converged to minimum. f() = " << s->fval << endl;
+	if (status == GSL_SUCCESS) {
+		//cout << endl << "Converged to minimum. f() = " << s->fval << endl;
+    }
 	else {
 		cout << "Error in minimization function f()" << endl;
 
@@ -407,7 +408,7 @@ int collection::calc_ratings() {
 		else
 			playerIt->second.rating -= 1.0; 
 	}	
-	cout << endl;
+	//cout << endl;
 
 	gsl_vector_free(x);
 	gsl_vector_free(ss);
@@ -481,12 +482,12 @@ int collection::calc_ratings_fdf() {
 		
 		status = gsl_multimin_test_gradient (s->gradient, 0.001);
 		
-		cout << "Finished iteration " << iter << "\tf() = " << gsl_multimin_fdfminimizer_minimum(s) << "\tnorm = " << gsl_blas_dnrm2(gsl_multimin_fdfminimizer_gradient(s)) << "\tStatus = " << status << endl;
+		//cout << "Finished iteration " << iter << "\tf() = " << gsl_multimin_fdfminimizer_minimum(s) << "\tnorm = " << gsl_blas_dnrm2(gsl_multimin_fdfminimizer_gradient(s)) << "\tStatus = " << status << endl;
 	} while ((status == GSL_CONTINUE) && (iter < 10000));
 
 	if (status == GSL_SUCCESS) {
-		cout << endl << "Converged to minimum. "; 	
-		cout << "Norm(gradient) = " << gsl_blas_dnrm2(gsl_multimin_fdfminimizer_gradient(s)) << endl;
+		//cout << endl << "Converged to minimum. "; 	
+		//cout << "Norm(gradient) = " << gsl_blas_dnrm2(gsl_multimin_fdfminimizer_gradient(s)) << endl;
 	}
 	else {
 		// Can hit an error by accident if the initial guess on player ratings happens to be exactly right.
