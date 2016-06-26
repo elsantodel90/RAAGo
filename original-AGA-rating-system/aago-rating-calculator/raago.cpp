@@ -173,4 +173,5 @@ int main()
 		if (tdListIt->second.ratingUpdated)
 			cout << tdListIt->second.id << '\t' << tdListIt->second.rating << '\t' << tdListIt->second.sigma << endl;
 	}
+    return 0;
 }
