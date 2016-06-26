@@ -12,3 +12,5 @@ class PlayerRating(models.Model):
     class Meta:
         unique_together = ('player', 'event')
 
+    def __str__(self):
+        return "Rating for {s.player} at {s.event}: {s.mu}({s.sigma})".format(s=self)

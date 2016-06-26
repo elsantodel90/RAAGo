@@ -11,7 +11,7 @@ class Player(TimeStampedModel):
     def all_games(self):
         return Game.objects.filter(Q(black_player=self) | Q(white_player=self))
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
 
@@ -51,5 +51,5 @@ class Game(TimeStampedModel):
         verbose_name = 'game'
         verbose_name_plural = 'games'
 
-    def __unicode__(self):
+    def __str__(self):
         return u"{s.white_player} vs {s.black_player} ({s.date})".format(s=self)

@@ -12,7 +12,7 @@ class Event(TimeStampedModel):
     start_date = models.DateField()
     end_date = models.DateField()
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
 
