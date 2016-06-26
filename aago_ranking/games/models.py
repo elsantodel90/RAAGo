@@ -29,6 +29,10 @@ _WIN_REASON_CHOICES = (
 
 
 class Game(TimeStampedModel):
+    event = models.ForeignKey('events.Event',
+                              db_index=True,
+                              related_name='games',
+                              null=True)
     white_player = models.ForeignKey('Player',
                                      db_index=True,
                                      related_name='games_as_white')
