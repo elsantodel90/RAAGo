@@ -2,14 +2,19 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import, division
 
-import logging
 import io
+import logging
 import math
+import subprocess
 
 logger = logging.getLogger(__name__)  # pylint: disable=invalid-name
 
+# TODO: move to settings
+RAAGO_BINARY = 'original-AGA-rating-system/aago-rating-calculator/raago'
+
 
 def generate_event_ratings(event_pk):
+    from aago_ranking.games.models import Player
     from aago_ranking.events.models import Event, EventPlayer
     from .models import PlayerRating
     event = Event.objects.get(pk=event_pk)
@@ -39,4 +44,24 @@ def generate_event_ratings(event_pk):
               game.result.upper(),
               file=data)
     print('END_GAMES', file=data)
-    return data.getvalue()
+
+    proc = subprocess.Popen([RAAGO_BINARY],
+                            stdin=subprocess.PIPE,
+                            stdout=subprocess.PIPE)
+    stdout = proc.communicate(data.getvalue().encode('utf-8'))[0]
+    if proc.wait() != 0:
+        return
+
+    event.playerrating_set.all().delete()
+
+    for line in stdout.decode('utf-8').splitlines():
+        line = line.strip()
+        if not line:
+            continue
+        player_id, mu, sigma = [float(x) for x in line.split()]
+        player = Player.objects.get(pk=player_id)
+        event.playerrating_set.create(
+            player=player,
+            mu=mu,
+            sigma=sigma,
+        )
