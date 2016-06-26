@@ -10,10 +10,10 @@ LIBS=-lm -lgsl -lgslcblas
 INC=-I/usr/include/mysql
 FLAGS=-O2 -Wall -Wextra -Wshadow
 
-all: bayrate
+all: raago
 
-bayrate: bayrate.cpp collection.o game.o player.o
-	g++ $(FLAGS) collection.o game.o bayrate.cpp player.o $(INC) $(LIBS) -o bayrate
+raago: raago.cpp collection.o game.o player.o
+	g++ $(FLAGS) collection.o game.o raago.cpp player.o $(INC) $(LIBS) -o raago
 
 game.o: game.cpp game.h
 	g++ $(FLAGS) -c game.cpp -o game.o $(INC) $(LIBS)
@@ -26,4 +26,4 @@ collection.o: collection.cpp collection.h
 
 clean:
 	rm *.o
-	rm bayrate
+	rm raago

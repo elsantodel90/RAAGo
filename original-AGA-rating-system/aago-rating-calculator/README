@@ -1,3 +1,8 @@
+raago is the ranking system to be used by AAGo (www.go.org.ar). It is a simple modification of AGA rating system, with the core calculations and statistical model left the same.
+
+### ORIGINAL AGA BAYRATE README
+
+
 This package, Bayrate, includes the ratings algorithm used by the American Go Association, along with various support programs and test data.  For details about the algorithm itself, visit http://www.usgo.org/ratings.  This package is not meant to be an exhaustive system that is fully functional for the purposes of rating local club events.  Rather, it is meant to serve as a base for interested developers.
 
 Bayrate is copyrighted by Philip Waldron and may distributed under the terms of the GNU General Public License, either version 3 or (at your option) any later version.  See the file COPYING for the full text of the license.
