@@ -12,6 +12,9 @@ class Event(TimeStampedModel):
     start_date = models.DateField()
     end_date = models.DateField()
 
+    def __unicode__(self):
+        return self.name
+
 
 _RANKING_CHOICES = (
     ('1d', '1dan'),
