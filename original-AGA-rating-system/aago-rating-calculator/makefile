@@ -23,4 +23,7 @@ collection.o: collection.cpp collection.h
 
 clean:
 	rm *.o
+
+superclean:
+	rm *.o
 	rm raago
