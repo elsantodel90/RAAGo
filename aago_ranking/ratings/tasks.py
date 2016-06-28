@@ -50,18 +50,38 @@ def generate_event_ratings(event_pk):
                             stdout=subprocess.PIPE)
     stdout = proc.communicate(data.getvalue().encode('utf-8'))[0]
     if proc.wait() != 0:
-        return
+        raise Exception("Failed execution of raago")
 
     event.playerrating_set.all().delete()
 
+    json = {}
     for line in stdout.decode('utf-8').splitlines():
         line = line.strip()
         if not line:
             continue
         player_id, mu, sigma = [float(x) for x in line.split()]
+        player_id = int(player_id)
         player = Player.objects.get(pk=player_id)
         event.playerrating_set.create(
             player=player,
             mu=mu,
             sigma=sigma,
         )
+        playerJson = {}
+        playerJson["name"] = player.name
+        playerJson["mu"] = mu
+        playerJson["sigma"] = sigma
+        json[str(player_id)] = playerJson
+    return json
+
+def run_ratings_update():
+    from aago_ranking.games.models import Player
+    from aago_ranking.events.models import Event, EventPlayer
+    from .models import PlayerRating
+    events = Event.objects.order_by('end_date') # TODO: check, this might not be a total order on the events, duplicate of decision in generate_event_ratings
+    json = {}
+    for event in events:
+        eventJson = {"name" : event.name}
+        eventJson["rating_changes"] = generate_event_ratings(event.pk)
+        json[str(event.pk)] = eventJson
+    return json
