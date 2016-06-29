@@ -529,6 +529,16 @@ int collection::calc_ratings_fdf() {
 	return 0;	
 }
 
+// a - b, but knows of the [-1,1) gap
+double gapAwareDifference(double a, double b) {
+    if (a*b > 0)
+        return a - b;
+    else if (a > 0)
+        return a - b - 2.0;
+    else
+        return a - b + 2.0;
+}
+
 /****************************************************************
 
 initSeeding () 
@@ -540,16 +550,30 @@ initSeeding ()
 *****************************************************************/
 void collection::initSeeding(map<int, tdListEntry> &tdList) {
 	map<int, int> winCount;
+    map<int, double> strongestDefeatedOpponentRating;
 	double deltaR;
 	
 	for (map<int, player>::iterator It = playerHash.begin(); It != playerHash.end(); It++) {
 		winCount[It->second.id] = 0;
+        strongestDefeatedOpponentRating[It->second.id] = -1000.0;
 	}
 	for (vector<game>::iterator gameIt = gameList.begin(); gameIt != gameList.end(); gameIt++) {
+        int winner,loser;
 		if (gameIt->whiteWins)
-			winCount[gameIt->white]++;
+        {
+			winner = gameIt->white;
+            loser  = gameIt->black;
+        }
 		else
-			winCount[gameIt->black]++;
+        {
+            winner = gameIt->black;
+            loser  = gameIt->white;
+        }
+        
+        winCount[winner]++;
+        map<int, tdListEntry>::iterator tdListIt = tdList.find(loser);
+        if (tdListIt != tdList.end())
+            strongestDefeatedOpponentRating[winner] = max(strongestDefeatedOpponentRating[winner], tdListIt->second.rating);
 	}
 
 	// Loop through each player who played a game in the tournament	
@@ -577,13 +601,11 @@ void collection::initSeeding(map<int, tdListEntry> &tdList) {
 		// We must have a record for them in the TDList?  If so then compute a new sigma
 		// a possibly a new seed
 		else {
-			if (It->second.seed * tdListIt->second.rating > 0)			
-				deltaR = It->second.seed - tdListIt->second.rating;
-			else
-				deltaR = It->second.seed - tdListIt->second.rating - 2;
-			
+            deltaR = gapAwareDifference(It->second.seed, tdListIt->second.rating);
+            double relativeBestWin = gapAwareDifference(strongestDefeatedOpponentRating[It->second.id], It->second.seed);
+            
 			// We don't let players demote themselves
-			if (deltaR < 0) {
+			if (deltaR <= 0) {
 				It->second.seed = tdListIt->second.rating;
 				double dayCount = tdListIt->second.ratingAgeInDays;	
 				It->second.sigma = sqrt(tdListIt->second.sigma * tdListIt->second.sigma + 0.0005 * 0.0005 * dayCount * dayCount);	
@@ -592,12 +614,12 @@ void collection::initSeeding(map<int, tdListEntry> &tdList) {
 			// If so, treat as a reseeding.  Players must win at least one game
 			// to trigger the self-promotion case.  Otherwise they are just seeded
 			// at their old rating.			
-			else if ( (deltaR >= 3.0) && (winCount[It->second.id] > 0) ) {
+			else if ( (deltaR >= 3.0) && (winCount[It->second.id] > 0) && (relativeBestWin > -1.0)) {
 				It->second.seed  = It->second.seed;
 				It->second.sigma = It->second.calc_init_sigma(It->second.seed);
 			}
 			// Is it a smaller self promotion?
-			else if ( (deltaR >= 1.0) && (winCount[It->second.id] > 0) ) {
+			else if ( (deltaR >= 1.0) && (winCount[It->second.id] > 0) && (relativeBestWin > -1.0) ) {
 				It->second.seed = tdListIt->second.rating + 0.024746 + 0.32127 * deltaR;
 				It->second.sigma = sqrt(tdListIt->second.sigma * tdListIt->second.sigma + 0.256 * pow(deltaR, 1.9475)); 
 			}
