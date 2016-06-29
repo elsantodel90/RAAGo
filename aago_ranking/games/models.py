@@ -39,6 +39,7 @@ class Game(TimeStampedModel):
     black_player = models.ForeignKey('Player',
                                      db_index=True,
                                      related_name='games_as_black')
+    description = models.TextField(default='', blank=True)
     handicap = models.IntegerField()
     komi = models.DecimalField(max_digits=10, decimal_places=1)
     result = models.CharField(max_length=16, choices=_RESULT_CHOICES)
