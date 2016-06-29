@@ -67,3 +67,6 @@ mailhog
 
 # static files directory
 staticfiles
+
+# issue2branch config file
+/.issue2branch.config
