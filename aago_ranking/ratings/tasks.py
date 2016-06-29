@@ -7,10 +7,9 @@ import logging
 import math
 import subprocess
 
-logger = logging.getLogger(__name__)  # pylint: disable=invalid-name
+from django.conf import settings
 
-# TODO: move to settings
-RAAGO_BINARY = 'original-AGA-rating-system/aago-rating-calculator/raago'
+logger = logging.getLogger(__name__)  # pylint: disable=invalid-name
 
 
 def generate_event_ratings(event_pk):
@@ -45,12 +44,13 @@ def generate_event_ratings(event_pk):
               file=data)
     print('END_GAMES', file=data)
 
-    proc = subprocess.Popen([RAAGO_BINARY],
+    proc = subprocess.Popen([settings.RAAGO_BINARY_PATH],
                             stdin=subprocess.PIPE,
                             stdout=subprocess.PIPE)
     stdout = proc.communicate(data.getvalue().encode('utf-8'))[0]
     if proc.wait() != 0:
-        raise Exception("Failed execution of raago")
+        raise Exception("Failed execution of raago: '{}'".format(
+            settings.RAAGO_BINARY_PATH))
 
     event.playerrating_set.all().delete()
 
