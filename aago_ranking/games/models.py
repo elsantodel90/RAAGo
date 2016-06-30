@@ -36,6 +36,7 @@ class Game(TimeStampedModel):
                               db_index=True,
                               related_name='games',
                               null=True)
+    date = models.DateField(db_index=True)
     white_player = models.ForeignKey('Player',
                                      db_index=True,
                                      related_name='games_as_white')
@@ -43,14 +44,13 @@ class Game(TimeStampedModel):
                                      db_index=True,
                                      related_name='games_as_black')
     description = models.TextField(default='', blank=True)
+
     handicap = models.IntegerField()
     komi = models.DecimalField(max_digits=10, decimal_places=1)
     result = models.CharField(max_length=16, choices=_RESULT_CHOICES)
     reason = models.CharField(max_length=16, choices=_REASON_CHOICES)
     points = models.DecimalField(max_digits=10, decimal_places=1)
     unrated = models.BooleanField(default=False)
-
-    date = models.DateField(db_index=True)
 
     class Meta(object):  # pylint: disable=too-few-public-methods
         verbose_name = 'game'
