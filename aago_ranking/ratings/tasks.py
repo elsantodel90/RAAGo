@@ -17,9 +17,7 @@ def generate_event_ratings(event_pk):
     from aago_ranking.events.models import Event, EventPlayer
     from .models import PlayerRating
     event = Event.objects.get(pk=event_pk)
-    # TODO: check, this might not be a total order on the events
-    ratings = PlayerRating.objects.filter(
-        event__end_date__lt=event.end_date).order_by('-event__end_date')
+    ratings = PlayerRating.objects.filter(event__lt=event).order_by('-event')
     event_players = EventPlayer.objects.filter(event=event)
     data = io.StringIO()
 
@@ -74,11 +72,12 @@ def generate_event_ratings(event_pk):
         json[str(player_id)] = playerJson
     return json
 
+
 def run_ratings_update():
     from aago_ranking.games.models import Player
     from aago_ranking.events.models import Event, EventPlayer
     from .models import PlayerRating
-    events = Event.objects.order_by('end_date') # TODO: check, this might not be a total order on the events, duplicate of decision in generate_event_ratings
+    events = Event.objects.all()
     json = {}
     for event in events:
         eventJson = {"name" : event.name}
