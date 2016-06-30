@@ -19,12 +19,15 @@ _RESULT_CHOICES = (
     ('black', _('Black Wins')),
     ('white', _('White Wins')),
     ('draw', _('Draw')),
+    ('both_lose', _('Both lose')),
 )
 
 _WIN_REASON_CHOICES = (
     ('points', _('Points')),
     ('resignation', _('Resignation')),
     ('walkover', _('Walkover')),
+    ('timeout', _('Timeout')),
+    ('other', _('Other')),
 )
 
 
