@@ -11,5 +11,5 @@ class PlayerAdmin(admin.ModelAdmin):
 @admin.register(Game)
 class GameAdmin(admin.ModelAdmin):
     list_display = ('pk', 'event', 'black_player', 'white_player', 'handicap',
-                    'komi', 'result', 'win_reason', 'points')
+                    'komi', 'result', 'reason', 'points')
     list_filter = ('event', )

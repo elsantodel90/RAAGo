@@ -22,7 +22,7 @@ _RESULT_CHOICES = (
     ('both_lose', _('Both lose')),
 )
 
-_WIN_REASON_CHOICES = (
+_REASON_CHOICES = (
     ('points', _('Points')),
     ('resignation', _('Resignation')),
     ('walkover', _('Walkover')),
@@ -46,7 +46,7 @@ class Game(TimeStampedModel):
     handicap = models.IntegerField()
     komi = models.DecimalField(max_digits=10, decimal_places=1)
     result = models.CharField(max_length=16, choices=_RESULT_CHOICES)
-    win_reason = models.CharField(max_length=16, choices=_WIN_REASON_CHOICES)
+    reason = models.CharField(max_length=16, choices=_REASON_CHOICES)
     points = models.DecimalField(max_digits=10, decimal_places=1)
     unrated = models.BooleanField(default=False)
 
