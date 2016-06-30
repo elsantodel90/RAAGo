@@ -13,6 +13,9 @@ class Event(TimeStampedModel):
     end_date = models.DateField()
     description = models.TextField(default='', blank=True)
 
+    class Meta:
+        ordering = ('end_date', 'start_date', 'pk', )
+
     def __str__(self):
         return self.name
 
