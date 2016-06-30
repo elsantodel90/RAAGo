@@ -45,6 +45,7 @@ class Game(TimeStampedModel):
     result = models.CharField(max_length=16, choices=_RESULT_CHOICES)
     win_reason = models.CharField(max_length=16, choices=_WIN_REASON_CHOICES)
     points = models.DecimalField(max_digits=10, decimal_places=1)
+    unrated = models.BooleanField(default=False)
 
     date = models.DateField(db_index=True)
 
