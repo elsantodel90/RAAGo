@@ -9,10 +9,12 @@ from .models import Event, EventPlayer
 
 class EventPlayerInline(admin.TabularInline):
     model = EventPlayer
+    extra = 0
 
 
 class EventGameInline(admin.TabularInline):
     model = Game
+    extra = 1
 
 
 @admin.register(Event)
