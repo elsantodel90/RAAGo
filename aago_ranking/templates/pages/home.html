@@ -1,1 +1,12 @@
 {% extends "base.html" %}
+
+{% block content %}
+
+<table style="text-align : center">
+    <tr><th style="text-align : center">Ranking</th><th style="text-align : center">Jugador</th><th style="text-align : center">Rating</th></tr>
+    {% for player in players %}
+    <tr><td style="text-align : right">{{ player.ranking }}</td><td style="text-align : left">{{ player.name }}</td><td style="text-align : left">{{ player.rating }}</td></tr>
+    {% endfor %}
+</table>
+
+{% endblock content %}
