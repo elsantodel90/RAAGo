@@ -7,10 +7,11 @@ from django.shortcuts import render
 
 from . import tasks
 
+
 @staff_member_required
 def runRatingsUpdates(request):
     if request.method == "POST":
         json = tasks.run_ratings_update()
         return JsonResponse(json)
     else:
-        raise Http404() # Meh, seria 405
+        raise Http404()  # Meh, seria 405

@@ -34,21 +34,24 @@ def generate_event_ratings(event_pk):
     print('END_PLAYERS', file=data)
     print('GAMES', file=data)
     for game in event.games.all():
-        print(game.white_player.pk,
-              game.black_player.pk,
-              game.handicap,
-              math.floor(game.komi),
-              game.result.upper(),
-              file=data)
+        print(
+            game.white_player.pk,
+            game.black_player.pk,
+            game.handicap,
+            math.floor(game.komi),
+            game.result.upper(),
+            file=data
+        )
     print('END_GAMES', file=data)
 
-    proc = subprocess.Popen([settings.RAAGO_BINARY_PATH],
-                            stdin=subprocess.PIPE,
-                            stdout=subprocess.PIPE)
+    proc = subprocess.Popen(
+        [settings.RAAGO_BINARY_PATH],
+        stdin=subprocess.PIPE,
+        stdout=subprocess.PIPE
+    )
     stdout = proc.communicate(data.getvalue().encode('utf-8'))[0]
     if proc.wait() != 0:
-        raise Exception("Failed execution of raago: '{}'".format(
-            settings.RAAGO_BINARY_PATH))
+        raise Exception("Failed execution of raago: '{}'".format(settings.RAAGO_BINARY_PATH))
 
     event.playerrating_set.all().delete()
 
@@ -60,11 +63,9 @@ def generate_event_ratings(event_pk):
         player_id, mu, sigma = [float(x) for x in line.split()]
         player_id = int(player_id)
         player = Player.objects.get(pk=player_id)
-        event.playerrating_set.create(
-            player=player,
-            mu=mu,
-            sigma=sigma,
-        )
+        event.playerrating_set.create(player=player,
+                                      mu=mu,
+                                      sigma=sigma, )
         playerJson = {}
         playerJson["name"] = player.name
         playerJson["mu"] = mu
@@ -80,7 +81,7 @@ def run_ratings_update():
     events = Event.objects.all()
     json = {}
     for event in events:
-        eventJson = {"name" : event.name}
+        eventJson = {"name": event.name}
         eventJson["rating_changes"] = generate_event_ratings(event.pk)
         json[str(event.pk)] = eventJson
     return json

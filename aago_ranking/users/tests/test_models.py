@@ -2,7 +2,6 @@ from test_plus.test import TestCase
 
 
 class TestUser(TestCase):
-
     def setUp(self):
         self.user = self.make_user()
 
@@ -13,7 +12,4 @@ class TestUser(TestCase):
         )
 
     def test_get_absolute_url(self):
-        self.assertEqual(
-            self.user.get_absolute_url(),
-            '/users/testuser/'
-        )
+        self.assertEqual(self.user.get_absolute_url(), '/users/testuser/')

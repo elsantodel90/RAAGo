@@ -20,7 +20,7 @@ _RESULT_CHOICES = (
     ('white', _('White Wins')),
     ('draw', _('Draw')),
     ('both_lose', _('Both lose')),
-)
+)  # yapf: disable
 
 _REASON_CHOICES = (
     ('points', _('Points')),
@@ -28,7 +28,7 @@ _REASON_CHOICES = (
     ('walkover', _('Walkover')),
     ('timeout', _('Timeout')),
     ('other', _('Other')),
-)
+)  # yapf: disable
 
 
 class GameQuerySet(models.QuerySet):
@@ -55,17 +55,10 @@ class GameQuerySet(models.QuerySet):
 
 
 class Game(TimeStampedModel):
-    event = models.ForeignKey('events.Event',
-                              db_index=True,
-                              related_name='games',
-                              null=True)
+    event = models.ForeignKey('events.Event', db_index=True, related_name='games', null=True)
     date = models.DateField(db_index=True)
-    white_player = models.ForeignKey('Player',
-                                     db_index=True,
-                                     related_name='games_as_white')
-    black_player = models.ForeignKey('Player',
-                                     db_index=True,
-                                     related_name='games_as_black')
+    white_player = models.ForeignKey('Player', db_index=True, related_name='games_as_white')
+    black_player = models.ForeignKey('Player', db_index=True, related_name='games_as_black')
     description = models.TextField(default='', blank=True)
 
     handicap = models.IntegerField()

@@ -19,7 +19,7 @@ class EventGameInline(admin.TabularInline):
     extra = 1
     formfield_overrides = {
         TextField: {'widget': Textarea(attrs={'rows': 1})}
-    }
+    }  # yapf: disable
 
 
 @admin.register(Event)
@@ -28,7 +28,7 @@ class EventAdmin(admin.ModelAdmin):
     inlines = (EventPlayerInline, EventGameInline)
     formfield_overrides = {
         TextField: {'widget': Textarea(attrs={'rows': 2})}
-    }
+    }  # yapf: disable
 
 
 @admin.register(EventPlayer)
