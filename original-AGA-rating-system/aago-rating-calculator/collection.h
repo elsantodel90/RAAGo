@@ -28,7 +28,6 @@
 #include <gsl/gsl_chebyshev.h>
 #include <gsl/gsl_rng.h>
 #include <gsl/gsl_randist.h>
-#include <boost/date_time/gregorian/gregorian.hpp>
 #include "player.h"
 #include "game.h"
 #include "tdListEntry.h"
