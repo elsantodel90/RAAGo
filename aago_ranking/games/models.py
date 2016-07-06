@@ -31,6 +31,29 @@ _REASON_CHOICES = (
 )
 
 
+class GameQuerySet(models.QuerySet):
+    @staticmethod
+    def _rated_query():
+        query = Q(handicap__range=(0, 9))
+        query &= Q(result__in=('black', 'white'))
+        query &= ~Q(reason='walkover')
+        query &= Q(unrated=False)
+        # Fractional komi
+        query &= Q(komi__endswith='.5')
+
+        komi_check = Q(handicap__lt=2, komi__range=(-20, 20))
+        komi_check |= Q(komi__range=(-10, 10))
+        query &= komi_check
+
+        return query
+
+    def rated(self):
+        return self.filter(self._rated_query())
+
+    def unrated(self):
+        return self.exclude(self._rated_query())
+
+
 class Game(TimeStampedModel):
     event = models.ForeignKey('events.Event',
                               db_index=True,
@@ -51,6 +74,8 @@ class Game(TimeStampedModel):
     reason = models.CharField(max_length=16, choices=_REASON_CHOICES)
     points = models.DecimalField(max_digits=10, decimal_places=1)
     unrated = models.BooleanField(default=False)
+
+    objects = GameQuerySet.as_manager()
 
     class Meta(object):  # pylint: disable=too-few-public-methods
         verbose_name = 'game'
