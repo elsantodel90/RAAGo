@@ -122,6 +122,12 @@ class Game(TimeStampedModel):
         elif self.result == 'null_match':
             self._validate_reason_in('other')
 
+        if self.result in ['white', 'black'] and self.reason == 'points':
+            if self.points <= 0:
+                raise ValidationError({'points': _('Points must be positive')})
+        elif self.points != 0:
+            raise ValidationError({'points': _('Points must be 0')})
+
         if self.event:
             if not self.event.start_date <= self.date <= self.event.end_date:
                 raise ValidationError({'date': _('Date is outside event date range')})
