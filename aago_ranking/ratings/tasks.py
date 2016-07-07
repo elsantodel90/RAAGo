@@ -62,7 +62,7 @@ def generate_event_ratings(event_pk):
 
     event.playerrating_set.all().delete()
 
-    json = {}
+    ratings_data = {}
     for line in stdout.decode('utf-8').splitlines():
         line = line.strip()
         if not line:
@@ -73,12 +73,12 @@ def generate_event_ratings(event_pk):
         event.playerrating_set.create(player=player,
                                       mu=mu,
                                       sigma=sigma, )
-        json[str(player_id)] = {
+        ratings_data[str(player_id)] = {
             "name": player.name,
             "mu": mu,
             "sigma": sigma,
         }
-    return json
+    return ratings_data
 
 
 def run_ratings_update():
@@ -86,9 +86,8 @@ def run_ratings_update():
     from aago_ranking.events.models import Event, EventPlayer
     from .models import PlayerRating
     events = Event.objects.all()
-    json = {
+    return {
         str(e.pk): {'name': e.name,
                     'rating_changes': generate_event_ratings(e.pk)}
         for e in events
     }
-    return json
