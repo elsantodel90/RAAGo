@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-o
+# pylint: disable=too-few-public-methods
 import datetime
 
 import factory
@@ -9,7 +10,7 @@ class PlayerFactory(factory.DjangoModelFactory):
     class Meta:
         model = 'games.Player'
 
-    name = factory.Sequence(lambda n: "Name {}".format(n))
+    name = factory.Sequence("Name {}".format)
 
 
 class GameFactory(factory.DjangoModelFactory):

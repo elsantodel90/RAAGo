@@ -1,3 +1,5 @@
+# pylint: disable=invalid-name
+
 import json
 
 from django.test import TestCase
@@ -16,19 +18,20 @@ class GameQuerySetRatedTests(TestCase):
     @staticmethod
     def _game_as_dict(game):
         ''' JSON game description for errors.'''
-        attrs = ['handicap', 'komi', 'result', 'reason' ,'points']
+        attrs = ['handicap', 'komi', 'result', 'reason', 'points']
         return {attr: getattr(game, attr) for attr in attrs}
 
     def _assert_rated(self, expected):
         display_expected = 'rated' if expected else 'unrated'
         message = 'Game {} failed. Expected: {}'.format(
-            json.dumps(self._game_as_dict(self.game),
-                       indent=1,
-                       sort_keys=True),
-            display_expected)
+            json.dumps(
+                self._game_as_dict(self.game),
+                indent=1, sort_keys=True
+            ), display_expected
+        )
         game = Game.objects.filter(pk=self.game.pk)
-        self.assertEquals(game.rated().exists(), expected, message)
-        self.assertEquals(game.unrated().exists(), not expected, message)
+        self.assertEqual(game.rated().exists(), expected, message)
+        self.assertEqual(game.unrated().exists(), not expected, message)
 
     def _assert_is_rated(self):
         self._assert_rated(True)
@@ -58,7 +61,7 @@ class GameQuerySetRatedTests(TestCase):
 
     def test_small_handicap_small_komi_is_rated(self):
         for handicap in [0, 1]:
-            for komi in [-19.5, -10.5, -6.5, -0.5,  0.5, 6.5, 10.5, 19.5]:
+            for komi in [-19.5, -10.5, -6.5, -0.5, 0.5, 6.5, 10.5, 19.5]:
                 self.game.handicap = handicap
                 self.game.komi = komi
                 self.game.save()

@@ -34,25 +34,35 @@ def generate_event_ratings(event_pk):
     print('END_PLAYERS', file=data)
     print('GAMES', file=data)
     for game in event.games.all():
-        print(game.white_player.pk,
-              game.black_player.pk,
-              game.handicap,
-              math.floor(game.komi),
-              game.result.upper(),
-              file=data)
+        print(
+            game.white_player.pk,
+            game.black_player.pk,
+            game.handicap,
+            math.floor(game.komi),
+            game.result.upper(),
+            file=data
+        )
     print('END_GAMES', file=data)
 
-    proc = subprocess.Popen([settings.RAAGO_BINARY_PATH],
-                            stdin=subprocess.PIPE,
-                            stdout=subprocess.PIPE)
-    stdout = proc.communicate(data.getvalue().encode('utf-8'))[0]
+    proc = subprocess.Popen(
+        [settings.RAAGO_BINARY_PATH],
+        stdin=subprocess.PIPE,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+    )
+    stdout, stderr = proc.communicate(data.getvalue().encode('utf-8'))
     if proc.wait() != 0:
-        raise Exception("Failed execution of raago: '{}'".format(
-            settings.RAAGO_BINARY_PATH))
+        raise Exception(
+            "Failed execution of raago: '{}'. Exit code: {}. Stderr: '{}'".format(
+                settings.RAAGO_BINARY_PATH,
+                proc.wait(),
+                stderr,
+            )
+        )
 
     event.playerrating_set.all().delete()
 
-    json = {}
+    ratings_data = {}
     for line in stdout.decode('utf-8').splitlines():
         line = line.strip()
         if not line:
@@ -60,17 +70,15 @@ def generate_event_ratings(event_pk):
         player_id, mu, sigma = [float(x) for x in line.split()]
         player_id = int(player_id)
         player = Player.objects.get(pk=player_id)
-        event.playerrating_set.create(
-            player=player,
-            mu=mu,
-            sigma=sigma,
-        )
-        playerJson = {}
-        playerJson["name"] = player.name
-        playerJson["mu"] = mu
-        playerJson["sigma"] = sigma
-        json[str(player_id)] = playerJson
-    return json
+        event.playerrating_set.create(player=player,
+                                      mu=mu,
+                                      sigma=sigma, )
+        ratings_data[str(player_id)] = {
+            "name": player.name,
+            "mu": mu,
+            "sigma": sigma,
+        }
+    return ratings_data
 
 
 def run_ratings_update():
@@ -78,9 +86,8 @@ def run_ratings_update():
     from aago_ranking.events.models import Event, EventPlayer
     from .models import PlayerRating
     events = Event.objects.all()
-    json = {}
-    for event in events:
-        eventJson = {"name" : event.name}
-        eventJson["rating_changes"] = generate_event_ratings(event.pk)
-        json[str(event.pk)] = eventJson
-    return json
+    return {
+        str(e.pk): {'name': e.name,
+                    'rating_changes': generate_event_ratings(e.pk)}
+        for e in events
+    }

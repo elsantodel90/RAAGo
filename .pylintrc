@@ -1,14 +1,20 @@
 [MASTER]
-load-plugins=
+load-plugins=pylint_django
 
 [FORMAT]
 max-line-length=120
 
 [MESSAGES CONTROL]
-disable=missing-docstring,invalid-name
+disable=missing-docstring,I
 
 [DESIGN]
 max-parents=13
 
 [TYPECHECK]
 generated-members=REQUEST,acl_users,aq_parent,"[a-zA-Z]+_set{1,2}",save,delete
+
+[VARIABLES]
+
+# A regular expression matching the name of dummy variables (i.e. expectedly
+# not used).
+dummy-variables-rgx=^_|dummy
