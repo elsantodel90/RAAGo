@@ -1,6 +1,6 @@
 from django.contrib import admin
-from django.forms.widgets import Textarea
-from django.db.models import TextField
+from django.forms.widgets import Textarea, TextInput
+from django.db.models import TextField, DecimalField
 
 from aago_ranking.games.models import Game
 
@@ -18,7 +18,8 @@ class EventGameInline(admin.TabularInline):
     model = Game
     extra = 1
     formfield_overrides = {
-        TextField: {'widget': Textarea(attrs={'rows': 1})}
+        TextField: {'widget': Textarea(attrs={'rows': 1})},
+        DecimalField: {'widget': TextInput(attrs={'step': '0.5', 'type': 'number'})},
     }  # yapf: disable
 
 
