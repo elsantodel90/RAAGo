@@ -42,11 +42,6 @@ class GameQuerySetRatedTests(TestCase):
     def test_default_is_rated(self):
         self._assert_is_rated()
 
-    def test_negative_handicap_is_unrated(self):
-        self.game.handicap = -1
-        self.game.save()
-        self._assert_is_unrated()
-
     def test_valid_handicaps_are_rated(self):
         for handicap in range(0, 10):
             self.game.handicap = handicap

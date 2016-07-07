@@ -1,6 +1,7 @@
 from django.db import models
 from django.db.models import Q
 from django.utils.translation import ugettext_lazy as _
+from django.core.exceptions import ValidationError
 
 from model_utils.models import TimeStampedModel
 
@@ -20,6 +21,7 @@ _RESULT_CHOICES = (
     ('white', _('White Wins')),
     ('draw', _('Draw')),
     ('both_lose', _('Both lose')),
+    ('null_match', _('Null match')),
 )  # yapf: disable
 
 _REASON_CHOICES = (
@@ -54,18 +56,28 @@ class GameQuerySet(models.QuerySet):
         return self.exclude(self._rated_query())
 
 
+def validate_whole_halfs(value):
+    fractional = value % 1
+    if not fractional in [0, 0.5]:
+        raise ValidationError(_('Value must be whole halfs: %(value)s'), params={'value': value})
+
+
 class Game(TimeStampedModel):
-    event = models.ForeignKey('events.Event', db_index=True, related_name='games', null=True)
+    event = models.ForeignKey(
+        'events.Event', db_index=True,
+        related_name='games',
+        null=True, blank=True
+    )
     date = models.DateField(db_index=True)
-    white_player = models.ForeignKey('Player', db_index=True, related_name='games_as_white')
     black_player = models.ForeignKey('Player', db_index=True, related_name='games_as_black')
+    white_player = models.ForeignKey('Player', db_index=True, related_name='games_as_white')
     description = models.TextField(default='', blank=True)
 
-    handicap = models.IntegerField()
-    komi = models.DecimalField(max_digits=10, decimal_places=1)
+    handicap = models.PositiveIntegerField()
+    komi = models.DecimalField(max_digits=10, decimal_places=1, validators=[validate_whole_halfs])
     result = models.CharField(max_length=16, choices=_RESULT_CHOICES)
     reason = models.CharField(max_length=16, choices=_REASON_CHOICES)
-    points = models.DecimalField(max_digits=10, decimal_places=1)
+    points = models.DecimalField(max_digits=10, decimal_places=1, validators=[validate_whole_halfs])
     unrated = models.BooleanField(default=False)
 
     objects = GameQuerySet.as_manager()
