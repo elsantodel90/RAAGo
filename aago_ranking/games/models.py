@@ -77,7 +77,11 @@ class Game(TimeStampedModel):
     komi = models.DecimalField(max_digits=10, decimal_places=1, validators=[validate_whole_halfs])
     result = models.CharField(max_length=16, choices=_RESULT_CHOICES)
     reason = models.CharField(max_length=16, choices=_REASON_CHOICES)
-    points = models.DecimalField(max_digits=10, decimal_places=1, validators=[validate_whole_halfs])
+    points = models.DecimalField(
+        max_digits=10, decimal_places=1,
+        validators=[validate_whole_halfs],
+        default=0
+    )
     unrated = models.BooleanField(default=False)
 
     objects = GameQuerySet.as_manager()
