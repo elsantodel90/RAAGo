@@ -1,6 +1,8 @@
 from __future__ import unicode_literals
 
 from django.db import models
+from django.utils.translation import ugettext_lazy as _
+from django.core.exceptions import ValidationError
 
 from model_utils.models import TimeStampedModel
 
@@ -21,6 +23,9 @@ class Event(TimeStampedModel):
     def __str__(self):
         return self.name
 
+    def clean(self):
+        if self.end_date < self.start_date:
+            raise ValidationError({'end_date': _('Event cannot end before it starts')})
 
 _RANKING_CHOICES = (
     ('1d', '1dan'),

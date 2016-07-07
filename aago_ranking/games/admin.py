@@ -1,4 +1,6 @@
 from django.contrib import admin
+from django.forms.widgets import TextInput
+from django.db.models import DecimalField
 
 from .models import Player, Game
 
@@ -15,3 +17,6 @@ class GameAdmin(admin.ModelAdmin):
         'points'
     )
     list_filter = ('event', )
+    formfield_overrides = {
+        DecimalField: {'widget': TextInput(attrs={'step': '0.5', 'type': 'number'})}
+    }  # yapf: disable
