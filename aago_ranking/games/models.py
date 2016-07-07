@@ -88,3 +88,36 @@ class Game(TimeStampedModel):
 
     def __str__(self):
         return u"{s.white_player} vs {s.black_player} ({s.date})".format(s=self)
+
+    def _validate_reason_in(self, *options):
+        if self.reason not in options:
+            reasons = dict(_REASON_CHOICES)
+            values = ", ".join(str(reasons[o]) for o in options)
+            raise ValidationError({'reason': _('Must be one of: %(values)s') % {'values': values}})
+
+    def clean(self):
+        if self.handicap == 1:
+            self.handicap = 0
+
+        if (self.komi % 1) != (self.points % 1):
+            message = _('Komi and points must have the same fractional value')
+            raise ValidationError({'komi': message, 'points': message})
+
+        if self.white_player == self.black_player:
+            raise ValidationError(_('Black and white players cannot be the same'))
+
+        if self.result == 'draw':
+            self._validate_reason_in('points', 'other')
+        elif self.result == 'both_lose':
+            self._validate_reason_in('walkover', 'other')
+        elif self.result == 'null_match':
+            self._validate_reason_in('other')
+
+        if self.event:
+            if not self.event.start_date <= self.date <= self.event.end_date:
+                raise ValidationError({'date': _('Date is outside event date range')})
+
+            if not self.event.eventplayer_set.filter(player=self.black_player).exists():
+                raise ValidationError({'black_player': _('Player does not belong to the event')})
+            if not self.event.eventplayer_set.filter(player=self.white_player).exists():
+                raise ValidationError({'white_player': _('Player does not belong to the event')})
