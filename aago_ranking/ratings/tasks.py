@@ -66,11 +66,11 @@ def generate_event_ratings(event_pk):
         event.playerrating_set.create(player=player,
                                       mu=mu,
                                       sigma=sigma, )
-        playerJson = {}
-        playerJson["name"] = player.name
-        playerJson["mu"] = mu
-        playerJson["sigma"] = sigma
-        json[str(player_id)] = playerJson
+        player_json = {}
+        player_json["name"] = player.name
+        player_json["mu"] = mu
+        player_json["sigma"] = sigma
+        json[str(player_id)] = player_json
     return json
 
 
@@ -81,7 +81,7 @@ def run_ratings_update():
     events = Event.objects.all()
     json = {}
     for event in events:
-        eventJson = {"name": event.name}
-        eventJson["rating_changes"] = generate_event_ratings(event.pk)
-        json[str(event.pk)] = eventJson
+        event_json = {"name": event.name}
+        event_json["rating_changes"] = generate_event_ratings(event.pk)
+        json[str(event.pk)] = event_json
     return json

@@ -1,3 +1,5 @@
+# pylint: disable=invalid-name
+
 import json
 
 from django.test import TestCase
@@ -28,8 +30,8 @@ class GameQuerySetRatedTests(TestCase):
             ), display_expected
         )
         game = Game.objects.filter(pk=self.game.pk)
-        self.assertEquals(game.rated().exists(), expected, message)
-        self.assertEquals(game.unrated().exists(), not expected, message)
+        self.assertEqual(game.rated().exists(), expected, message)
+        self.assertEqual(game.unrated().exists(), not expected, message)
 
     def _assert_is_rated(self):
         self._assert_rated(True)
