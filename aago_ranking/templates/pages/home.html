@@ -8,11 +8,11 @@
       <th>Jugador</th>
       <th>Rating</th>
     </tr>
-    {% for player in players %}
+    {% for player, rating in sorted_ratings %}
     <tr>
-      <td>{{ player.ranking }}</td>
+      <td>{{ forloop.counter }}</td>
       <td>{{ player.name }}</td>
-      <td>{{ player.rating }}</td>
+      <td>{{ rating|floatformat:"3" }}</td>
     </tr>
     {% endfor %}
 </table>
