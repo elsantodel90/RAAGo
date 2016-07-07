@@ -47,11 +47,18 @@ def generate_event_ratings(event_pk):
     proc = subprocess.Popen(
         [settings.RAAGO_BINARY_PATH],
         stdin=subprocess.PIPE,
-        stdout=subprocess.PIPE
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
     )
-    stdout = proc.communicate(data.getvalue().encode('utf-8'))[0]
+    stdout, stderr = proc.communicate(data.getvalue().encode('utf-8'))
     if proc.wait() != 0:
-        raise Exception("Failed execution of raago: '{}'".format(settings.RAAGO_BINARY_PATH))
+        raise Exception(
+            "Failed execution of raago: '{}'. Exit code: {}. Stderr: '{}'".format(
+                settings.RAAGO_BINARY_PATH,
+                proc.wait(),
+                stderr,
+            )
+        )
 
     event.playerrating_set.all().delete()
 
@@ -66,11 +73,11 @@ def generate_event_ratings(event_pk):
         event.playerrating_set.create(player=player,
                                       mu=mu,
                                       sigma=sigma, )
-        player_json = {}
-        player_json["name"] = player.name
-        player_json["mu"] = mu
-        player_json["sigma"] = sigma
-        json[str(player_id)] = player_json
+        json[str(player_id)] = {
+            "name": player.name,
+            "mu": mu,
+            "sigma": sigma,
+        }
     return json
 
 
@@ -79,9 +86,9 @@ def run_ratings_update():
     from aago_ranking.events.models import Event, EventPlayer
     from .models import PlayerRating
     events = Event.objects.all()
-    json = {}
-    for event in events:
-        event_json = {"name": event.name}
-        event_json["rating_changes"] = generate_event_ratings(event.pk)
-        json[str(event.pk)] = event_json
+    json = {
+        str(e.pk): {'name': e.name,
+                    'rating_changes': generate_event_ratings(e.pk)}
+        for e in events
+    }
     return json
