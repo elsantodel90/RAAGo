@@ -1,3 +1,5 @@
+import math
+
 from django.db import models
 from django.db.models import Q
 from django.utils.translation import ugettext_lazy as _
@@ -56,9 +58,12 @@ class GameQuerySet(models.QuerySet):
         return self.exclude(self._rated_query())
 
 
+def _fractional_part(value):
+    return value - math.floor(value)
+
+
 def validate_whole_halfs(value):
-    fractional = value % 1
-    if not fractional in [0, 0.5]:
+    if not _fractional_part(value) in [0, 0.5]:
         raise ValidationError(_('Value must be whole halfs: %(value)s'), params={'value': value})
 
 
@@ -103,7 +108,7 @@ class Game(TimeStampedModel):
         if self.handicap == 1:
             self.handicap = 0
 
-        if (self.komi % 1) != (self.points % 1):
+        if _fractional_part(self.komi) != _fractional_part(self.points):
             message = _('Komi and points must have the same fractional value')
             raise ValidationError({'komi': message, 'points': message})
 
