@@ -108,10 +108,6 @@ class Game(TimeStampedModel):
         if self.handicap == 1:
             self.handicap = 0
 
-        if _fractional_part(self.komi) != _fractional_part(self.points):
-            message = _('Komi and points must have the same fractional value')
-            raise ValidationError({'komi': message, 'points': message})
-
         if self.white_player == self.black_player:
             raise ValidationError(_('Black and white players cannot be the same'))
 
@@ -125,6 +121,9 @@ class Game(TimeStampedModel):
         if self.result in ['white', 'black'] and self.reason == 'points':
             if self.points <= 0:
                 raise ValidationError({'points': _('Points must be positive')})
+            if _fractional_part(self.komi) != _fractional_part(self.points):
+                message = _('Komi and points must have the same fractional value')
+                raise ValidationError({'komi': message, 'points': message})
         elif self.points != 0:
             raise ValidationError({'points': _('Points must be 0')})
 
