@@ -1,12 +1,14 @@
 from __future__ import unicode_literals
 
+import logging
+
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
-from django.core.exceptions import ValidationError
 
 from model_utils.models import TimeStampedModel
 
-# Create your models here.
+logger = logging.getLogger(__name__)  # pylint: disable=invalid-name
 
 
 class Event(TimeStampedModel):
@@ -26,6 +28,24 @@ class Event(TimeStampedModel):
     def clean(self):
         if self.end_date < self.start_date:
             raise ValidationError({'end_date': _('Event cannot end before it starts')})
+
+    def broken_games(self):
+        return self.games.exclude(
+            white_player__eventplayer__event=self,
+            black_player__eventplayer__event=self,
+            date__range=(self.start_date, self.end_date),
+        )
+
+    def remove_broken_games(self):
+        games = self.broken_games()
+        count = games.count()
+        games.update(event=None)
+        logging.info("Removed %d broken games from '%s'", count, self)
+
+    def save(self, *args, **kwargs):
+        super(Event, self).save(*args, **kwargs)
+        self.remove_broken_games()
+
 
 _RANKING_CHOICES = (
     ('1d', '1dan'),
@@ -71,6 +91,15 @@ _RANKING_CHOICES = (
 
 
 class EventPlayer(models.Model):
-    event = models.ForeignKey('Event')
+    event = models.ForeignKey('Event', editable=False)
     player = models.ForeignKey('games.Player')
     ranking = models.CharField(max_length=4, choices=_RANKING_CHOICES)
+
+    def save(self, *args, **kwargs):
+        super(EventPlayer, self).save(*args, **kwargs)
+        self.event.remove_broken_games()
+
+    def delete(self, *args, **kwargs):
+        super(EventPlayer, self).delete(*args, **kwargs)
+        self.event.remove_broken_games()
+
