@@ -30,8 +30,3 @@ class EventAdmin(admin.ModelAdmin):
     formfield_overrides = {
         TextField: {'widget': Textarea(attrs={'rows': 2})}
     }  # yapf: disable
-
-
-@admin.register(EventPlayer)
-class EventPlayerAdmin(admin.ModelAdmin):
-    list_display = ('event', 'player', 'ranking')
