@@ -10,6 +10,7 @@ from model_utils.models import TimeStampedModel
 
 class Player(TimeStampedModel):
     name = models.CharField(max_length=255)
+    is_aago_member = models.BooleanField()
 
     def all_games(self):
         return Game.objects.filter(Q(black_player=self) | Q(white_player=self))

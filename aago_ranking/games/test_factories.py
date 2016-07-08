@@ -11,6 +11,7 @@ class PlayerFactory(factory.DjangoModelFactory):
         model = 'games.Player'
 
     name = factory.Sequence("Name {}".format)
+    is_aago_member = True
 
 
 class GameFactory(factory.DjangoModelFactory):
