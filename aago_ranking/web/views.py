@@ -3,14 +3,18 @@ from django.http import HttpResponse
 
 from aago_ranking.ratings.models import PlayerRating
 
+import datetime
+
+def ratingIsValid(r):
+    # We do not care about leap years at all for these purposes
+    anYearAgo = datetime.date.today() - datetime.timedelta(days=365)
+    return r.player.is_aago_member or anYearAgo < r.event.end_date
 
 def get_sorted_ratings():
-    ratings = PlayerRating.objects.order_by('event').select_related('player').filter(
-        player__is_aago_member=True
-    )
+    ratings = PlayerRating.objects.order_by('event')
     # Note: this query retrieves *every* rating from the DB.
     #   It can be optimized if needed.
-    last_ratings = {r.player: r.mu for r in ratings}
+    last_ratings = {r.player: r.mu for r in ratings if ratingIsValid(r)}
     return sorted(last_ratings.items(), reverse=True, key=(lambda item: item[1]))
 
 def homepage(request):
