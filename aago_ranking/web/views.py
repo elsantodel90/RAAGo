@@ -22,7 +22,7 @@ def homepage(request):
 
 def csv_ranking(request):
     lines = ["Ranking;Jugador;Rating"]
-    lines += ["{};{};{:.3}".format(i+1, player.name, rating) for i, (player, rating) in enumerate(get_sorted_ratings())]
+    lines += ["{};{};{:.3f}".format(i+1, player.name, rating) for i, (player, rating) in enumerate(get_sorted_ratings())]
     lines.append("") # To get the last end of file character when joining
     return HttpResponse("\r\n".join(lines), content_type='text/plain')
     
