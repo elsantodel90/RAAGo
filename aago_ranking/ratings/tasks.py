@@ -33,7 +33,7 @@ def generate_event_ratings(event_pk):
 
     print('END_PLAYERS', file=data)
     print('GAMES', file=data)
-    for game in event.games.all():
+    for game in event.games.rated():
         print(
             game.white_player.pk,
             game.black_player.pk,
