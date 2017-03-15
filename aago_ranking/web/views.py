@@ -21,8 +21,8 @@ def homepage(request):
     return render(request, 'pages/home.html', {'sorted_ratings': get_sorted_ratings(), })
 
 def csv_ranking(request):
-    lines = ["Ranking;Jugador;Rating"]
-    lines += ["{};{};{:.3f}".format(i+1, player.name, rating) for i, (player, rating) in enumerate(get_sorted_ratings())]
+    lines = ["Ranking;Socio;Jugador;Rating"]
+    lines += ["{};{};{};{:.3f}".format(i+1, ("SI" if player.is_aago_member else "NO") , player.name, rating) for i, (player, rating) in enumerate(get_sorted_ratings())]
     lines.append("") # To get the last end of file character when joining
     return HttpResponse("\r\n".join(lines), content_type='text/plain')
     

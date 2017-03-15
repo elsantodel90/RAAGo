@@ -1,5 +1,7 @@
 {% extends "base.html" %}
 
+{% load staticfiles %}
+
 {% block content %}
 
 <table class="table">
@@ -11,7 +13,7 @@
     {% for player, rating in sorted_ratings %}
     <tr>
       <td>{{ forloop.counter }}</td>
-      <td>{{ player.name }}</td>
+      <td>{% if player.is_aago_member %} <img src="{% static 'images/aago-logo.jpg' %}" />{% endif %} {{ player.name }}</td>
       <td>{{ rating|floatformat:"3" }}</td>
     </tr>
     {% endfor %}
