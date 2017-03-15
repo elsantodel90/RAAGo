@@ -9,12 +9,20 @@
       <th>Ranking</th>
       <th>Jugador</th>
       <th>Rating</th>
+      <th>Categoría</th>
+      <th>Partidas</th>
     </tr>
-    {% for player, rating in sorted_ratings %}
+    {% for ranking, player, rating, category, rated_games in sorted_ratings %}
+    {% if ranking == "(inactivo)" %}
+    <tr class="jugador-inactivo">
+    {% else %}
     <tr>
-      <td>{{ forloop.counter }}</td>
+    {% endif %}
+      <td>{{ ranking }}</td>
       <td>{% if player.is_aago_member %} <img src="{% static 'images/aago-logo.jpg' %}" />{% endif %} {{ player.name }}</td>
       <td>{{ rating|floatformat:"3" }}</td>
+      <td>{{ category }}</td>
+      <td>{{ rated_games}}</td>
     </tr>
     {% endfor %}
 </table>
