@@ -8,21 +8,19 @@
     <tr>
       <th>Ranking</th>
       <th>Jugador</th>
+      <th>Partidas</th>
       <th>Rating</th>
       <th>Categoría</th>
-      <th>Partidas</th>
     </tr>
-    {% for ranking, player, rating, category, rated_games in sorted_ratings %}
-    {% if ranking == "(inactivo)" %}
-    <tr class="jugador-inactivo">
-    {% else %}
-    <tr>
-    {% endif %}
+    {% for ranking, player, rated_games, rating, category, css_classes in sorted_ratings %}
+    <tr class="{{css_classes}}">
       <td>{{ ranking }}</td>
-      <td>{% if player.is_aago_member %} <img src="{% static 'images/aago-logo.jpg' %}" />{% endif %} {{ player.name }}</td>
+      <td><div style="float:left;width:90%;" >{{ player.name }}</div>
+          <div style="float:right;width:10%;">{% if player.is_aago_member %} <img src="{% static 'images/aago-logo.jpg' %}" />{% endif %}</div>
+      </td>
+      <td>{{ rated_games}}</td>
       <td>{{ rating|floatformat:"3" }}</td>
       <td>{{ category }}</td>
-      <td>{{ rated_games}}</td>
     </tr>
     {% endfor %}
 </table>
