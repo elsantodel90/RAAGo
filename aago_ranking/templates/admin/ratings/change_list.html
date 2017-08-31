@@ -1,7 +1,7 @@
 {% extends "admin/change_list.html" %}
 
 {% block content %}
-<a href="{% url "ratings:run_ratings_update" %}"><input type="submit" value="Run ratings update"></a>
+<form action="{% url "ratings:run_ratings_update" %}"  method="post">{% csrf_token %}<input type="submit" value="Run ratings update"></form>
 {{ block.super }}
 {% endblock %}
 
