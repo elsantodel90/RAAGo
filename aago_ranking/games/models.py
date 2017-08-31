@@ -32,6 +32,7 @@ _REASON_CHOICES = (
     ('resignation', _('Resignation')),
     ('walkover', _('Walkover')),
     ('timeout', _('Timeout')),
+    ('unknown', _('Unknown')),
     ('other', _('Other')),
 )  # yapf: disable
 
