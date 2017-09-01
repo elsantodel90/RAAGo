@@ -55,5 +55,5 @@ def csv_ranking(request):
     lines = ["Ranking;Socio;Jugador;Partidas;Rating;Categoría"]
     lines += ["{};{};{};{};{:.3f};{}".format(ranking, ("SI" if player.is_aago_member else "NO") , player.name, rated_games, rating, category) for ranking, player, rated_games, rating, category, _css_classes in get_sorted_ratings()]
     lines.append("") # To get the last end of file character when joining
-    return HttpResponse("\r\n".join(lines), content_type='text/plain')
+    return HttpResponse("\r\n".join(lines), content_type='text/plain; charset=utf-8')
     
