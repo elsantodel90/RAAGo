@@ -21,11 +21,16 @@ def loadPlayerRecord(event, playerId, key, value):
         event[1][-1][key] = value
 
 def createNewRound(event, roundId):
+    if roundId != len(event[2]):
+        raise InvalidEventFileError("Round section id does not match section position within file: " + str(roundId))
     event[2].append({"id" : roundId, "games" : defaultdict(dict)})
 
 gamePattern = re.compile("(Game[0-9]+)(Player1|Player2|Result)$")
 
 def loadRoundRecord(event, roundId, key, value):
+    if key == "Date":
+        event[2][-1]["date"] = value
+        return
     m = re.match(gamePattern, key)
     if not m:
         raise InvalidEventFileError("Invalid game record key: '" + key + "'")
@@ -38,6 +43,8 @@ def loadRoundRecord(event, roundId, key, value):
         else:
             raise InvalidEventFileError("Invalid game record result: '" + value + "'")
         attribute = "result"
+    elif attribute == "Date":
+        attribute = "date"
     else:
         assert attribute in ["Player1", "Player2"]
         if attribute == "Player1":
