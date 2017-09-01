@@ -6,18 +6,47 @@ from io import TextIOWrapper
 from . import fileloader
 import django.utils.encoding
 
+from aago_ranking.events.models import Event, EventPlayer
+from aago_ranking.games.models import Player
+        
+
 EVENT_FILE_ENCODING = "latin-1"
+
+class InvalidCategoryError(Exception):
+    def __init__(self, message):
+        super().__init__(message)
+
+class NonexistentPlayerError(Exception):
+    def __init__(self, message):
+        super().__init__(message)
+
+
+def translate_ranking(ranking):
+    if ranking.upper().endswith("KYU"):
+        return ranking[:-3].strip() + "k"
+    elif ranking.upper().endswith("DAN"):
+        return ranking[:-3].strip() + "d"
+    else:
+        raise InvalidCategoryError("Invalid category: " + ranking)
+
+def translate_player(player_name):
+    try:
+        return Player.objects.get(name=player_name)
+    except Player.DoesNotExist:
+        raise NonexistentPlayerError("Player named '" + player_name + "' does not exist.")
 
 def upload_event_file(event_file):
     try:
         event_data = fileloader.loadEventFile(TextIOWrapper(event_file.file, encoding=EVENT_FILE_ENCODING))
-        from aago_ranking.events.models import Event, EventPlayer
-        Event.objects.create(name       = event_data[0]["Name"],
-                             start_date = event_data[0]["StartDate"],
-                             end_date   = event_data[0]["EndDate"],
-                            )
+        player_list = [ (translate_player(player["Name"]) , translate_ranking(player["Category"]))  for player in event_data[1]]
+        event = Event.objects.create(name       = event_data[0]["Name"],
+                                     start_date = event_data[0]["StartDate"],
+                                     end_date   = event_data[0]["EndDate"],
+                                    )
+        for player, rank  in player_list:
+            EventPlayer.objects.create(event = event, player = player, ranking = rank)
         return {"success" : True}
-    except fileloader.InvalidEventFileError as e:
+    except (fileloader.InvalidEventFileError, InvalidCategoryError, NonexistentPlayerError) as e:
         return {"error" : "Invalid event file: " + event_file.name , "error_detail" : str(e)}
     
 
