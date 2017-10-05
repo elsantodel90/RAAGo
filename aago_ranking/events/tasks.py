@@ -9,7 +9,7 @@ import django.utils.encoding
 from aago_ranking.events.models import Event, EventPlayer
 from aago_ranking.games.models import Player, Game
 
-EVENT_FILE_ENCODING = "latin-1"
+EVENT_FILE_ENCODING = "utf8"
 
 class InvalidCategoryError(Exception):
     def __init__(self, message):

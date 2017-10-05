@@ -10,13 +10,22 @@ def loadEventRecord(event, _none, key, value):
     if key in ["Name", "StartDate", "EndDate"]:
         event[0][key] = value
 
+startingPlayerId = None
+
 def createNewPlayer(event, playerId):
-    if playerId != len(event[1]):
+    global startingPlayerId
+    if startingPlayerId is None:
+        if playerId not in [0,1]:
+            raise InvalidEventFileError("Player section id should be numbered starting at either 0 or 1, but not " + str(playerId))
+        startingPlayerId = playerId
+    playerId -= startingPlayerId
+    if playerId !=  len(event[1]):
         raise InvalidEventFileError("Player section id does not match section position within file: " + str(playerId))
     event[1].append({"id" : playerId})
 
 
 def loadPlayerRecord(event, playerId, key, value):
+    playerId -= startingPlayerId
     if key in ["Name", "Category"]:
         event[1][-1][key] = value
 
@@ -57,7 +66,7 @@ def loadRoundRecord(event, roundId, key, value):
                 raise ValueError()
         except ValueError:
             raise InvalidEventFileError("Invalid player id: '" + value + "'")
-        value = ival
+        value = ival - startingPlayerId
     event[2][-1]["games"][gameId][attribute] = value
 
 
@@ -94,5 +103,5 @@ def loadEventFile(f):
     return event
 
 if __name__ == "__main__":
-    with open(sys.argv[1],"r", encoding="latin-1") as f:
+    with open(sys.argv[1],"r", encoding="utf8") as f:
         print(loadEventFile(f)[2])
