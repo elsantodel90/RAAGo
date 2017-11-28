@@ -57,18 +57,23 @@ def upload_event_file(event_file):
         for event_round in event_data[2]:
             round_date = event_round.get("date")
             for round_game in event_round["games"]:
-                if "date" in round_game:
-                    game_date = round_game["date"]
+                game_date     = round_game.get("date", round_date)
+                game_reason   = round_game.get("reason", "unknown")
+                game_handicap = round_game.get("handicap", 0)
+                if game_handicap == 0:
+                    game_komi = 6.5
                 else:
-                    game_date = round_date
+                    game_komi = 0.5
+                if game_handicap == 1:
+                    game_handicap = 0
                 Game.objects.create(event        = event,
                                     date         = game_date,
                                     black_player = player_list[round_game["black_player"]][0],
                                     white_player = player_list[round_game["white_player"]][0],
-                                    handicap     = 0,
-                                    komi         = 6.5,
+                                    handicap     = game_handicap,
+                                    komi         = game_komi,
                                     result       = round_game["result"],
-                                    reason       = "unknown",
+                                    reason       = game_reason,
                                    )
             
         return {"success" : True}
