@@ -32,8 +32,12 @@ def generate_event_ratings(event_pk):
             print("NULL", "NULL", "NULL", file=data)
 
     print('END_PLAYERS', file=data)
+    
+    playersWithGames = set()
     print('GAMES', file=data)
     for game in event.games.rated():
+        playersWithGames.add(game.white_player.pk)
+        playersWithGames.add(game.black_player.pk)
         print(
             game.white_player.pk,
             game.black_player.pk,
@@ -43,7 +47,6 @@ def generate_event_ratings(event_pk):
             file=data
         )
     print('END_GAMES', file=data)
-
     proc = subprocess.Popen(
         [settings.RAAGO_BINARY_PATH],
         stdin=subprocess.PIPE,
@@ -62,22 +65,26 @@ def generate_event_ratings(event_pk):
 
     event.playerrating_set.all().delete()
 
+    def readRangoOutputLine(line):
+        player_id, mu, sigma = line.split()
+        return int(player_id), float(mu), float(sigma)
+
     ratings_data = {}
     for line in stdout.decode('utf-8').splitlines():
         line = line.strip()
         if not line:
             continue
-        player_id, mu, sigma = [float(x) for x in line.split()]
-        player_id = int(player_id)
-        player = Player.objects.get(pk=player_id)
-        event.playerrating_set.create(player=player,
-                                      mu=mu,
-                                      sigma=sigma, )
-        ratings_data[str(player_id)] = {
-            "name": player.name,
-            "mu": mu,
-            "sigma": sigma,
-        }
+        player_id, mu, sigma = readRangoOutputLine(line)
+        if player_id in playersWithGames:
+            player = Player.objects.get(pk=player_id)
+            event.playerrating_set.create(player=player,
+                                          mu=mu,
+                                          sigma=sigma, )
+            ratings_data[str(player_id)] = {
+                "name": player.name,
+                "mu": mu,
+                "sigma": sigma,
+            }
     return ratings_data
 
 
