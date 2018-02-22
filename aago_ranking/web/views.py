@@ -20,7 +20,7 @@ def monthsAgo(months, date):
 
 def ratingIsValid(r):
     anYearAgo = monthsAgo(12, datetime.date.today())
-    return r.player.is_aago_member or anYearAgo < r.event.end_date
+    return r.player.is_aago_member or anYearAgo <= r.event.end_date
 
 def category(mu, provisional):
     if provisional:
