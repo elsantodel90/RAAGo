@@ -4,10 +4,22 @@ from django.http import HttpResponse
 from aago_ranking.ratings.models import PlayerRating
 
 import datetime
+import calendar
+
+def monthsAgo(months, date):
+    assert months >= 0
+    def days(month, year):
+        return calendar.monthrange(year, month)[1]
+    day, month, year = date.day, date.month, date.year
+    month -= months
+    while month < 1:
+        month += 12
+        year -= 1
+    day = min(day, days(month, year))
+    return datetime.date(year, month, day)
 
 def ratingIsValid(r):
-    # We do not care about leap years at all for these purposes
-    anYearAgo = datetime.date.today() - datetime.timedelta(days=365)
+    anYearAgo = monthsAgo(12, datetime.date.today())
     return r.player.is_aago_member or anYearAgo < r.event.end_date
 
 def category(mu, provisional):
@@ -30,7 +42,7 @@ def get_sorted_ratings():
     last_ratings = {r.player: (r.mu, r.sigma, r.event.end_date) for r in ratings if ratingIsValid(r)}
     
     scoreboard = sorted(last_ratings.items(), reverse=True, key=(lambda item: item[1][0]))
-    active_deadline = datetime.date.today() - datetime.timedelta(days=185)
+    active_deadline = monthsAgo(6, datetime.date.today())
     next_rank = 1
     for i, (player,(mu, sigma, last_event_date)) in enumerate(scoreboard):
         rated_games = len(player.all_games().rated())
