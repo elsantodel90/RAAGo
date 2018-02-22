@@ -33,7 +33,6 @@ def get_sorted_ratings():
     active_deadline = datetime.date.today() - datetime.timedelta(days=185)
     next_rank = 1
     for i, (player,(mu, sigma, last_event_date)) in enumerate(scoreboard):
-        print (formatRating(mu, sigma))
         rated_games = len(player.all_games().rated())
         css_classes = []
         provisional = False
@@ -49,15 +48,15 @@ def get_sorted_ratings():
         if last_event_date >= active_deadline and rated_games >= 10:
             ranking = str(next_rank)
             next_rank += 1
-        scoreboard[i] = (ranking, player, rated_games, formatRating(mu, sigma), category(mu, provisional), " ".join(css_classes))
+        scoreboard[i] = (ranking, player, rated_games, formatRating(mu, sigma), category(mu, provisional), last_event_date.strftime("%d/%m/%Y"), " ".join(css_classes))
     return scoreboard
 
 def homepage(request):
     return render(request, 'pages/home.html', {'sorted_ratings': get_sorted_ratings(), })
 
 def csv_ranking(request):
-    lines = ["Ranking;Socio;Jugador;Partidas;Rating;Categoría"]
-    lines += ["{};{};{};{};{};{}".format(ranking, ("SI" if player.is_aago_member else "NO") , player.name, rated_games, rating, category) for ranking, player, rated_games, rating, category, _css_classes in get_sorted_ratings()]
+    lines = ["Ranking;Socio;Jugador;Partidas;Rating;Categoría;Última participación"]
+    lines += ["{};{};{};{};{};{};{}".format(ranking, ("SI" if player.is_aago_member else "NO") , player.name, rated_games, rating, category, last_event_date) for ranking, player, rated_games, rating, category, last_event_date,  _css_classes in get_sorted_ratings()]
     lines.append("") # To get the last end of file character when joining
     return HttpResponse("\r\n".join(lines), content_type='text/plain; charset=utf-8')
     
