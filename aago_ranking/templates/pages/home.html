@@ -19,7 +19,7 @@
           <div style="float:right;width:10%;">{% if player.is_aago_member %} <img src="{% static 'images/aago-logo.jpg' %}" />{% endif %}</div>
       </td>
       <td>{{ rated_games}}</td>
-      <td>{{ rating|floatformat:"3" }}</td>
+      <td>{{ rating }}</td>
       <td>{{ category }}</td>
     </tr>
     {% endfor %}
