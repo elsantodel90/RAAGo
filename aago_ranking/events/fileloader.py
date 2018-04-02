@@ -62,6 +62,8 @@ def loadRoundRecord(event, roundId, key, value):
             value = "resignation"
         elif value == "T":
             value = "timeout"
+        elif value == "W":
+            value = "walkover"
         else:
             raise InvalidEventFileError("Invalid game record reason: '" + value + "'")
         attribute = "reason"
