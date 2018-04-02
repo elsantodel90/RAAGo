@@ -75,7 +75,7 @@ def loadRoundRecord(event, roundId, key, value):
             attribute = "black_player"
         try:
             ival = int(value)
-            if ival < 0 or ival >= len(event[1]):
+            if ival < 0 or ival - startingPlayerId >= len(event[1]):
                 raise ValueError()
         except ValueError:
             raise InvalidEventFileError("Invalid player id: '" + value + "'")
