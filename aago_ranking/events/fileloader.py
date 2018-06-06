@@ -86,6 +86,8 @@ def loadRoundRecord(event, roundId, key, value):
 sectionPattern = re.compile("([^0-9]+)([0-9]+)$")
 
 def loadEventFile(f):
+    global startingPlayerId
+    startingPlayerId = None
     event = ({},[],[]) # Event data, players, rounds
     sectionName = sectionNumber = None
     sectionCreationFunction         = { "Player" : createNewPlayer, "Round" : createNewRound} 
