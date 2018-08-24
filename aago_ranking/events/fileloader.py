@@ -49,6 +49,8 @@ def loadRoundRecord(event, roundId, key, value):
             value = "black"
         elif value == "W":
             value = "white"
+        elif value == "2":
+            value = "both_lose"
         else:
             raise InvalidEventFileError("Invalid game record result: '" + value + "'")
         attribute = "result"

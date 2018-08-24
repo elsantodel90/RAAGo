@@ -64,6 +64,10 @@ def upload_event_file(event_file):
                     game_komi = 6.5
                 else:
                     game_komi = 0.5
+                if game_reason == "points":
+                    game_points = 1000.5
+                else
+                    game_points = 0.0
                 if game_handicap == 1:
                     game_handicap = 0
                 Game.objects.create(event        = event,
@@ -74,6 +78,7 @@ def upload_event_file(event_file):
                                     komi         = game_komi,
                                     result       = round_game["result"],
                                     reason       = game_reason,
+                                    points       = game_points,
                                    )
             
         return {"success" : True}
