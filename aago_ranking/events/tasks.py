@@ -66,7 +66,7 @@ def upload_event_file(event_file):
                     game_komi = 0.5
                 if game_reason == "points":
                     game_points = 1000.5
-                else
+                else:
                     game_points = 0.0
                 if game_handicap == 1:
                     game_handicap = 0
