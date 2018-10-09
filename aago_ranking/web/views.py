@@ -29,9 +29,9 @@ def category(mu, provisional):
     else:
         suffix = ""
     if mu > 0:
-        return "{}D{}".format(int(mu), suffix)
+        return "{}D{}".format(1+int(mu), suffix)
     else:
-        return "{}K{}".format(int(-mu), suffix)
+        return "{}K{}".format(1+int(-mu), suffix)
 
 def formatRating(mu, sigma):
     return "{:.3f} ± {:.3f}".format(mu, sigma)
