@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from django.shortcuts import render
 from django.http import HttpResponse
 
@@ -35,11 +36,20 @@ def category(mu, provisional):
 def formatRating(mu, sigma):
     return "{:.3f} ± {:.3f}".format(mu, sigma)
 
+def convertRatingToNewConvention(mu):
+    # Se elimina el "gap" famoso en (-1, 1)
+    if mu <= -1.0:
+        return mu + 1.0
+    elif mu >= 1.0:
+        return mu - 1.0
+    else:
+        assert False
+
 def get_sorted_ratings():
     ratings = PlayerRating.objects.order_by('event')
     # Note: this query retrieves *every* rating from the DB.
     #   It can be optimized if needed.
-    last_ratings = {r.player: (r.mu, r.sigma, r.event.end_date) for r in ratings if ratingIsValid(r)}
+    last_ratings = {r.player: (convertRatingToNewConvention(r.mu), r.sigma, r.event.end_date) for r in ratings if ratingIsValid(r)}
     
     scoreboard = sorted(last_ratings.items(), reverse=True, key=(lambda item: item[1][0]))
     active_deadline = monthsAgo(6, datetime.date.today())
