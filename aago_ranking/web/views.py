@@ -29,11 +29,14 @@ def category(mu, provisional):
     else:
         suffix = ""
     if mu > 0:
-        return "{}D{}".format(1+int(mu), suffix)
+        return "{}D{}".format(int(mu), suffix)
     else:
-        return "{}K{}".format(1+int(-mu), suffix)
+        return "{}K{}".format(int(-mu), suffix)
 
-def formatRating(mu, sigma):
+def formatRatingEGF(mu, sigma):
+    return "{:.0f} ± {:.0f}".format(2100.0 + 100.0 * (convertRatingToNewConvention(mu) - 0.5), 100.0 * sigma)
+
+def formatRatingAGA(mu, sigma):
     return "{:.3f} ± {:.3f}".format(mu, sigma)
 
 def convertRatingToNewConvention(mu):
@@ -49,7 +52,7 @@ def get_sorted_ratings():
     ratings = PlayerRating.objects.order_by('event')
     # Note: this query retrieves *every* rating from the DB.
     #   It can be optimized if needed.
-    last_ratings = {r.player: (convertRatingToNewConvention(r.mu), r.sigma, r.event.end_date) for r in ratings if ratingIsValid(r)}
+    last_ratings = {r.player: (r.mu, r.sigma, r.event.end_date) for r in ratings if ratingIsValid(r)}
     
     scoreboard = sorted(last_ratings.items(), reverse=True, key=(lambda item: item[1][0]))
     active_deadline = monthsAgo(6, datetime.date.today())
@@ -70,15 +73,15 @@ def get_sorted_ratings():
         if last_event_date >= active_deadline and rated_games >= 10:
             ranking = str(next_rank)
             next_rank += 1
-        scoreboard[i] = (ranking, player, rated_games, formatRating(mu, sigma), category(mu, provisional), last_event_date.strftime("%d/%m/%Y"), " ".join(css_classes))
+        scoreboard[i] = (ranking, player, rated_games, formatRatingAGA(mu, sigma), formatRatingEGF(mu, sigma), category(mu, provisional), last_event_date.strftime("%d/%m/%Y"), " ".join(css_classes))
     return scoreboard
 
 def homepage(request):
     return render(request, 'pages/home.html', {'sorted_ratings': get_sorted_ratings(), })
 
 def csv_ranking(request):
-    lines = ["Ranking;Socio;Jugador;Partidas;Rating;Categoría;Última participación"]
-    lines += ["{};{};{};{};{};{};{}".format(ranking, ("SI" if player.is_aago_member else "NO") , player.name, rated_games, rating, category, last_event_date) for ranking, player, rated_games, rating, category, last_event_date,  _css_classes in get_sorted_ratings()]
+    lines = ["Ranking;Socio;Jugador;Partidas;Rating en formato AGA; Rating en formato EGF;Categoría;Última participación"]
+    lines += ["{};{};{};{};{};{};{};{}".format(ranking, ("SI" if player.is_aago_member else "NO") , player.name, rated_games, rating_aga, rating_egf, category, last_event_date) for ranking, player, rated_games, rating_aga, rating_egf, category, last_event_date,  _css_classes in get_sorted_ratings()]
     lines.append("") # To get the last end of file character when joining
     return HttpResponse("\r\n".join(lines), content_type='text/plain; charset=utf-8')
     
