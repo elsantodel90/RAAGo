@@ -9,20 +9,18 @@
       <th>Ranking</th>
       <th>Jugador</th>
       <th>Partidas</th>
-      <th>Rating en formato AGA</th>
-      <th>Rating en formato EGF</th>
+      <th>Rating</th>
       <th>Categoría</th>
       <th>Última participación</th>
     </tr>
-    {% for ranking, player, rated_games, rating_aga, rating_egf, category, last_event_date, css_classes in sorted_ratings %}
+    {% for ranking, player, rated_games, rating, category, last_event_date, css_classes in sorted_ratings %}
     <tr class="{{css_classes}}">
       <td>{{ ranking }}</td>
       <td><div style="float:left;width:90%;" >{% if player.is_aago_member %}<a href="http://go.org.ar/jugadores/perfilRango.php?usuario={{player.id}}">{% endif %}{{ player.name }}{% if player.is_aago_member %}</a>{% endif %}</div>
           <div style="float:right;width:10%;">{% if player.is_aago_member %} <img src="{% static 'images/aago-logo.jpg' %}" />{% endif %}</div>
       </td>
       <td>{{ rated_games}}</td>
-      <td>{{ rating_aga }}</td>
-      <td>{{ rating_egf }}</td>
+      <td>{{ rating }}</td>
       <td>{{ category }}</td>
       <td>{{ last_event_date }}</td>
     </tr>
