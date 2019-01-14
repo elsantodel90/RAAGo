@@ -4,7 +4,7 @@
 
 {% block content %}
 
-<table class="table">
+<table class="table rango">
     <tr>
       <th>Ranking</th>
       <th>Jugador</th>
@@ -16,7 +16,7 @@
     {% for ranking, player, rated_games, rating, category, last_event_date, css_classes in sorted_ratings %}
     <tr class="{{css_classes}}">
       <td>{{ ranking }}</td>
-      <td><div style="float:left;width:90%;" >{% if player.is_aago_member %}<a href="http://go.org.ar/jugadores/perfilRango.php?usuario={{player.id}}">{% endif %}{{ player.name }}{% if player.is_aago_member %}</a>{% endif %}</div>
+      <td><div style="float:left;width:90%;" >{% if player.is_aago_member %}<a href="http://go.org.ar/rango/perfil-usuario?usuario={{player.id}}">{% endif %}{{ player.name }}{% if player.is_aago_member %}</a>{% endif %}</div>
           <div style="float:right;width:10%;">{% if player.is_aago_member %} <img src="{% static 'images/aago-logo.jpg' %}" />{% endif %}</div>
       </td>
       <td>{{ rated_games}}</td>
