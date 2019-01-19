@@ -84,7 +84,9 @@ def toAago(inputFile, outputFile):
         rank = formatRank(p.get("rank"))
         participants[playerId] = (playerFirstName + " " + playerSurname, rank)
     allRounds = groupByRounds(map(parseGame, tree.find("Games").findall("Game")))
-    print("Rounds={}".format(len(allRounds)))
+    totalRounds = int(tree.find("TournamentParameterSet").find("GeneralParameterSet").get("numberOfRounds"))
+    print("Rounds={}".format(totalRounds))
+    print("ActualRound={}".format(len(allRounds)-1))
     print("Numberofplayers={}".format(len(participants)))
     participantsToId = dict()
     for i, (pid, (name, rank)) in enumerate(sorted(participants.items(), key = lambda item : value(item[1][1]), reverse = True )):
