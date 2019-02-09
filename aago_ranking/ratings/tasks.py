@@ -6,6 +6,8 @@ import io
 import logging
 import math
 import subprocess
+import plotter
+import os
 
 from django.conf import settings
 
@@ -85,6 +87,7 @@ def generate_event_ratings(event_pk):
                 "mu": mu,
                 "sigma": sigma,
             }
+            
     return ratings_data
 
 
@@ -93,8 +96,13 @@ def run_ratings_update():
     from aago_ranking.events.models import Event, EventPlayer
     from .models import PlayerRating
     events = Event.objects.all()
-    return {
+    ret = {
         str(e.pk): {'name': e.name,
                     'rating_changes': generate_event_ratings(e.pk)}
         for e in events
     }
+    for player in Players.objects:
+        plot_filename = "{}.png".format(player.pk)
+        # TODO: Poner aca los valores posta
+        plotter.plot_data([1,10,50], [-0.5,1.5,5], os.path.join(settings.RAAGO_PLOTS_PATH, plot_filename))
+    return ret

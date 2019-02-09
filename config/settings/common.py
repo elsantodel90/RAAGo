@@ -246,3 +246,7 @@ ADMIN_URL = r'^admin/'
 RAAGO_BINARY_PATH = env(
     'RAAGO_BINARY_PATH',
     default='original-AGA-rating-system/aago-rating-calculator/raago')
+
+RAAGO_PLOTS_PATH = env(
+    'RAAGO_PLOTS_PATH',
+    default='rating-plots')

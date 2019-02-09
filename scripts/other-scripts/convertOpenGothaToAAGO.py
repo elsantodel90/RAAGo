@@ -82,6 +82,7 @@ def toAago(inputFile, outputFile):
         playerSurname = p.get("name")
         playerId = (playerSurname + playerFirstName).replace(" ","").upper()
         rank = formatRank(p.get("rank"))
+        assert(playerId not in participants)
         participants[playerId] = (playerFirstName + " " + playerSurname, rank)
     allRounds = groupByRounds(map(parseGame, tree.find("Games").findall("Game")))
     totalRounds = int(tree.find("TournamentParameterSet").find("GeneralParameterSet").get("numberOfRounds"))
