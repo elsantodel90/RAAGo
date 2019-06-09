@@ -4,38 +4,24 @@ from lxml import etree
 import collections
 
 INITIAL_SCORES={
-#    "VILLASALTEGOMEZCRISTIANALBERTO" : 1,
-#    "ARESFEDERICO" : 0,
-#    "BENROBERTO" : 1,
-#    "GUIAMETJAIME" : 1,
-#    "CHAVEZMATIAS" : 1,
-#    "PAPESCHIROSARIO" : 1,
-#    "COMITOANDRES" : 1,
-#    "D'ALBUQUERQUEFRANCISCOMANUEL" : 1,
-#    "GARROFEMARTÍN" : 1,
-#    "LAPLAGNESANTIAGO" : 1,
-#    "ACOSTAJOEL" : 0,
-#    "MACGOWANDWAYNE" : 0,
-#    "ONEGAMURRAYJOSÉMARÍA" : 0,
-#    "DEFINEFERNANDOARIEL" : 0,
-#    "ZINNILUCIANO" : 0,
-#    "PEREIRAGONZALO" : 0,
-#    "VIÑASJUAN" : 0,
-#    "PICCIONIJOSE" : 0,
-#    "CHINMOONSUNG" : 1,
-#    "GARCÍANAHUEL" : 1,
-#    "TABARESSANTIAGO" : 1,
-#    "ROMEROMARIAAGOSTINA" : 1,
-#    "BROWNHAROLDO" : 1,
-#    "CORREAFRANCOIGNACIO" : 1,
-#    "ALBORNOZMATEO" : 0,
-#    "GASTINGISSELLA" : 1,
-#    "LINDENBAUMENRIQUE" : 0,
-#    "GIMENEZHORACIO" : 0,
-#    "VÁZQUEZCAMILO" : 0,
-#    "CIFREBERNARDO" : 0,
-#    "MARENGONICOLÁS" : 0,
-#    "BYEBYE" : 0,
+    "SALERNOLUCIANO" : 1,
+    "MOONSUNGCHIN" : 1,
+    "LAPLAGNESANTIAGO" : 1,
+    "COMITOANDRES" : 1,
+    "GARCIANAHUEL" : 1,
+    "PAPESCHIROSARIO" : 1,
+    "CORREAFRANCO" : 1,
+    "PICCIONIJOSE" : 1,
+    "DEFINEFERNANDO" : 1,
+    "ACOSTAJOEL" : 1,
+    "LINDENBAUMENRIQUE" : 0,
+    "ANDINIARMANDO" : 0,
+    "FRANCOHAROLUCAS" : 0,
+    "LONGAPABLO" : 0,
+    "ONEGAJOSEMARIA" : 0,
+    "VIÑASJUAN" : 0,
+    "MARENGONICOLAS" : 0,
+    "OROZCOJUANMANUEL" : 0,
 }
 
 def formatRank(rankString):
@@ -86,36 +72,25 @@ def toAago(inputFile, outputFile):
         participants[playerId] = (playerFirstName + " " + playerSurname, rank)
     allRounds = groupByRounds(map(parseGame, tree.find("Games").findall("Game")))
     totalRounds = int(tree.find("TournamentParameterSet").find("GeneralParameterSet").get("numberOfRounds"))
-    print("Rounds={}".format(totalRounds))
-    print("ActualRound={}".format(len(allRounds)-1))
-    print("Numberofplayers={}".format(len(participants)))
+    outputFile.write("Rounds={}\n".format(totalRounds))
+    outputFile.write("ActualRound={}\n".format(len(allRounds)-1))
+    outputFile.write("Numberofplayers={}\n".format(len(participants)))
     participantsToId = dict()
     for i, (pid, (name, rank)) in enumerate(sorted(participants.items(), key = lambda item : value(item[1][1]), reverse = True )):
         participantsToId[pid] = i+1
-        print("[Player{}]".format(i+1))
-        print('Name="{}"'.format(name))
-        print("Category={}".format(rank))
+        outputFile.write("[Player{}]\n".format(i+1))
+        outputFile.write('Name="{}"\n'.format(name))
+        outputFile.write("Category={}\n".format(rank))
         if pid in INITIAL_SCORES:
-            print("InitialScore={}".format(INITIAL_SCORES[pid]))
-    #for x in dir(tree):
-    #    print(x)
-    #exit()
+            outputFile.write("InitialScore={}\n".format(INITIAL_SCORES[pid]))
     for roundNumber, games in allRounds.items():
-        print("[Round{}]".format(roundNumber))
+        outputFile.write("[Round{}]\n".format(roundNumber))
         for gameId, (_, whitePlayer, blackPlayer, handicap, result) in enumerate(games):
-            print("Game{}Player1={}".format(gameId, participantsToId[whitePlayer]))
-            print("Game{}Player2={}".format(gameId, participantsToId[blackPlayer]))
-            #print("Game{}Handicap={}".format(gameId, handicap)) Revisar bien en el parsing, como se guarda el handicap, que sea compatible [casi seguro lo es]
-            #print("Game{}VictoriaPor={}".format(gameId, handicap)) Ver que onda la reason
-            print("Game{}Result={}".format(gameId, result))
-
-    #print(tree.tag)
-    #print(tree.attrib)
-    #print(repr(tree.text))
-    #print("*")
-    #for cosa in tree.iterchildren():
-    #    print(cosa)
-    pass
+            outputFile.write("Game{}Player1={}\n".format(gameId, participantsToId[whitePlayer]))
+            outputFile.write("Game{}Player2={}\n".format(gameId, participantsToId[blackPlayer]))
+            #outputFile.write("Game{}Handicap={}\n".format(gameId, handicap)) Revisar bien en el parsing, como se guarda el handicap, que sea compatible [casi seguro lo es]
+            #outputFile.write("Game{}VictoriaPor={}\n".format(gameId, ¿¿reason??)) Ver que onda la reason
+            outputFile.write("Game{}Result={}\n".format(gameId, result))
 
 if __name__ == "__main__":
     import sys
