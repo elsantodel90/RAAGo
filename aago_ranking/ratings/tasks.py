@@ -10,6 +10,7 @@ from . import plotter
 import os
 
 from django.conf import settings
+from django.db.models import Q
 
 logger = logging.getLogger(__name__)  # pylint: disable=invalid-name
 
@@ -19,7 +20,10 @@ def generate_event_ratings(event_pk):
     from aago_ranking.events.models import Event, EventPlayer
     from .models import PlayerRating
     event = Event.objects.get(pk=event_pk)
-    ratings = PlayerRating.objects.filter(event__lt=event).order_by('-event')
+    is_previous_event = (Q(event__end_date__lt=event.end_date) |
+                       (Q(event__end_date=event.end_date) & Q(event__start_date__lt=event.start_date)) |
+                       (Q(event__end_date=event.end_date) & Q(event__start_date=event.start_date) & Q(event__pk__lt=event.pk)))
+    ratings = PlayerRating.objects.filter(is_previous_event).order_by('-event')
     event_players = EventPlayer.objects.filter(event=event)
     data = io.StringIO()
 
