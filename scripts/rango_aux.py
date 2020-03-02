@@ -1,13 +1,15 @@
 #!/usr/bin/python3
 
-from math import erf, exp, sqrt
+from math import exp
 from scipy.stats import norm
+
+sigma_px = 1.0569463399999999 # Numero magico del modelo: en definitiva estima que el desvio en la performance de un jugador es 0.747 
 
 def new_ratings(mu1, mu2, sigma1, sigma2):
     # Function de verosimilitud bayesiana (con constantes ya ignoradas): buscamos el mu que maximiza esto,
     # y ese es el nuevo ranking del 1.
     def f(nmu1, nmu2):
-        return norm.cdf((nmu1 - nmu2)/sqrt(sigma1*sigma1 + sigma2*sigma2)) * exp(-0.5 * ((nmu1-mu1)/sigma1)**2.0) * exp(-0.5 * ((nmu2-mu2)/sigma2)**2.0)
+        return norm.cdf((nmu1 - nmu2)/sigma_px) * exp(-0.5 * ((nmu1-mu1)/sigma1)**2.0) * exp(-0.5 * ((nmu2-mu2)/sigma2)**2.0)
     best = -1.0
     bestx = None
     besty = None
@@ -32,11 +34,11 @@ def new_ratings(mu1, mu2, sigma1, sigma2):
     return bestx, besty
 
 def show_data(mu1, mu2, sigma1, sigma2):
-    print("Estimated prior probability for player 1 win: {}".format(norm.cdf((mu1 - mu2)/sqrt(sigma1*sigma1 + sigma2*sigma2))))
+    print("Estimated prior probability for player 1 win: {}".format(norm.cdf((mu1 - mu2)/sigma_px)))
     nmu1, nmu2 = new_ratings(mu1, mu2, sigma1 , sigma2)
     print("Estimated new rating for player 1: {:.3f} (+ {:.3f})".format(nmu1, nmu1 - mu1))
     print("Estimated new rating for player 2: {:.3f} (- {:.3f})".format(nmu2, mu2 - nmu2))
-    print("Estimated new probability for player 1 win: {}".format(norm.cdf((nmu1 - nmu2)/sqrt(sigma1*sigma1 + sigma2*sigma2))))
+    print("Estimated new probability for player 1 win: {}".format(norm.cdf((nmu1 - nmu2)/sigma_px)))
 
 
 show_data(-3.748, -1.136, 0.219 , 0.465)
