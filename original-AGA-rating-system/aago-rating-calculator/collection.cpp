@@ -623,6 +623,19 @@ void collection::initSeeding(map<int, tdListEntry> &tdList) {
 				It->second.seed = tdListIt->second.rating + 0.024746 + 0.32127 * deltaR;
 				It->second.sigma = sqrt(tdListIt->second.sigma * tdListIt->second.sigma + 0.256 * pow(deltaR, 1.9475)); 
 			}
+			else if ((winCount[It->second.id] > 0) && (relativeBestWin > -1.0))
+			 {
+                double oneDeltaRSeed = tdListIt->second.rating + 0.024746 + 0.32127;
+				double oneSigma = sqrt(tdListIt->second.sigma * tdListIt->second.sigma + 0.256); 
+                double deltaRSeed = tdListIt->second.rating;
+                double dayCount = tdListIt->second.ratingAgeInDays;	
+                double deltaRSigma = sqrt(tdListIt->second.sigma * tdListIt->second.sigma + 0.0005 * 0.0005 * dayCount * dayCount);
+                It->second.seed  = deltaRSeed + (oneDeltaRSeed - deltaRSeed) * deltaR;
+                if (oneSigma <= 0 || deltaRSigma <= 0 )
+                    It->second.sigma = 0;
+                else
+                    It->second.sigma = pow(deltaRSigma, 1-deltaR) * pow(oneSigma, deltaR);
+			}
 			else {
 				It->second.seed  = tdListIt->second.rating;
 				double dayCount = tdListIt->second.ratingAgeInDays;	
