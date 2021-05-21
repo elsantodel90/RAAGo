@@ -68,7 +68,8 @@ def toAago(inputFile, outputFile):
     # Los ids son apellidonombre en mayusculas sin espacios.
     # Y si esos ids colapsan? Testear...
     
-    for p in tree.find("ByePlayers").findall("ByePlayer"):
+    bye = 0
+    for p in tree.find("ByePlayers").findall("ByePlayer") if tree.find("ByePlayers") is not None else []: 
         bye = 1
 
     for p in tree.find("Players").findall("Player"):
@@ -109,7 +110,7 @@ def toAago(inputFile, outputFile):
             outputFile.write("Game{}Result={}\n".format(gameId, result))
             gg = gameId
             
-        for p in tree.find("ByePlayers").findall("ByePlayer"):
+        for p in tree.find("ByePlayers").findall("ByePlayer") if tree.find("ByePlayers") is not None else []:
             #outputFile.write("HOLAA!{}---{}--{}".format(p.get("roundNumber"), gg+1, participantsToId[p.get("player")]))            
             if p.get("roundNumber") == str(roundNumber+1):
                 #outputFile.write("CHAUU")            

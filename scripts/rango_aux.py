@@ -26,7 +26,8 @@ from scipy.stats import norm
 #           -- Se asume que el jugador 1 es quien gana el partido
 #           -- Las variaciones de rango calculadas deberian ser correctas, asumiendo que se cumplen todas las hipotesis anteriores
 
-sigma_px = 1.0568465 # Numero magico del modelo: en definitiva estima que el desvio estandar en la performance de un jugador es 0.7473
+#sigma_px = 1.0568465 # Numero magico del modelo: en definitiva estima que el desvio estandar en la performance de un jugador es 0.7473
+sigma_px = 1.43614
 
 def match_win_prob(mu1, mu2):
     return norm.cdf((mu1 - mu2)/sigma_px)
@@ -116,6 +117,7 @@ def show_data(mu1, mu2, sigma1, sigma2, age_ranking_1_in_days, age_ranking_2_in_
     print("Estimated new probability for player 1 win: {}".format(win_chance(nmu1, nmu2, sigma1, sigma2))) # Se deberian usar los desvios finales, que son distintos... pero no los calculamos aca.
 
 
-show_data(-3.748, -1.136, 0.219 , 0.465, 0, 0)
+show_data(2, 2, 1.0 , 1.0, 0, 0)
 #show_data(3.748, -1.136, 0.219 , 0.465, 0, 0)
 #show_data(-1.136, 3.748, 0.465, 0.219 , 0, 0)
+#0.381
