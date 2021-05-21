@@ -31,7 +31,7 @@ def category(mu, provisional):
     if mu > 0:
         return "{}D{}".format(int(mu), suffix)
     else:
-        return "{}K{}".format(int(-mu), suffix)
+        return "{}K{}".format(min(30, int(-mu)), suffix)
 
 def formatRatingEGF(mu, sigma):
     return "{:.0f} ± {:.0f}".format(2100.0 + 100.0 * (convertRatingToNewConvention(mu) - 0.5), 100.0 * sigma)
