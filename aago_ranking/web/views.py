@@ -48,7 +48,7 @@ def convertRatingToNewConvention(mu):
     else:
         assert False
 
-def get_sorted_ratings():
+def get_sorted_ratings(only_active):
     ratings = PlayerRating.objects.order_by('event')
     # Note: this query retrieves *every* rating from the DB.
     #   It can be optimized if needed.
@@ -57,6 +57,7 @@ def get_sorted_ratings():
     scoreboard = sorted(last_ratings.items(), reverse=True, key=(lambda item: item[1][0]))
     active_deadline = monthsAgo(6, datetime.date.today())
     next_rank = 1
+    ret = []
     for i, (player,(mu, sigma, last_event_date)) in enumerate(scoreboard):
         rated_games = len(player.all_games().rated())
         css_classes = []
@@ -70,14 +71,20 @@ def get_sorted_ratings():
             css_classes.append("jugador-provisional")
             provisional = True
             ranking = "―"
-        if last_event_date >= active_deadline and rated_games >= 10:
+        isRanked = last_event_date >= active_deadline and rated_games >= 10
+        if isRanked:
             ranking = str(next_rank)
             next_rank += 1
-        scoreboard[i] = (ranking, player, rated_games, formatRatingAGA(mu, sigma), category(mu, provisional), last_event_date.strftime("%d/%m/%Y"), " ".join(css_classes))
-    return scoreboard
+        if isRanked or not only_active:
+            row = (ranking, player, rated_games, formatRatingAGA(mu, sigma), category(mu, provisional), last_event_date.strftime("%d/%m/%Y"), " ".join(css_classes))
+            ret.append(row)
+    return ret
 
 def homepage(request):
-    return render(request, 'pages/home.html', {'sorted_ratings': get_sorted_ratings(), })
+    return render(request, 'pages/home.html', {'sorted_ratings': get_sorted_ratings(only_active = False), })
+
+def homepage_active(request):
+    return render(request, 'pages/home.html', {'sorted_ratings': get_sorted_ratings(only_active = True), })
 
 def csv_ranking(request):
     lines = ["Ranking;Socio;Jugador;Partidas;Rating;Categoría;Última participación"]
