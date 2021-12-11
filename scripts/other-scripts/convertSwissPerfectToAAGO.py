@@ -26,7 +26,6 @@ def main(argv):
     with open(args.txt_file, "r", encoding='cp1252') as f:
         lines = f.read().split("\n")
 
-    print(lines, file=sys.stderr)
     header = lines[0].split('|')
 
     assert(header[0] == 'Nº')
