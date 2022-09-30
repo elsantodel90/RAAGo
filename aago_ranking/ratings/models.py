@@ -4,8 +4,8 @@ from django.db import models
 
 
 class PlayerRating(models.Model):
-    player = models.ForeignKey('games.Player', db_index=True)
-    event = models.ForeignKey('events.Event', db_index=True)
+    player = models.ForeignKey('games.Player', db_index=True,on_delete=models.CASCADE,)
+    event = models.ForeignKey('events.Event', db_index=True,on_delete=models.CASCADE,)
     mu = models.FloatField()
     sigma = models.FloatField()
 

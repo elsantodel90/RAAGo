@@ -2,7 +2,7 @@ import math
 
 from django.db import models
 from django.db.models import Q
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from django.core.exceptions import ValidationError
 
 from model_utils.models import TimeStampedModel
@@ -73,11 +73,11 @@ class Game(TimeStampedModel):
     event = models.ForeignKey(
         'events.Event', db_index=True,
         related_name='games',
-        null=True, blank=True
+        null=True, blank=True, on_delete=models.CASCADE,
     )
     date = models.DateField(db_index=True)
-    black_player = models.ForeignKey('Player', db_index=True, related_name='games_as_black')
-    white_player = models.ForeignKey('Player', db_index=True, related_name='games_as_white')
+    black_player = models.ForeignKey('Player', db_index=True, related_name='games_as_black',on_delete=models.CASCADE,)
+    white_player = models.ForeignKey('Player', db_index=True, related_name='games_as_white',on_delete=models.CASCADE,)
     description = models.TextField(default='', blank=True)
 
     handicap = models.PositiveIntegerField()

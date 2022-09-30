@@ -1,10 +1,12 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from django.conf.urls import url
+from django.urls import re_path as url
 from django.views.generic import TemplateView
 
 from . import views
+
+app_name = 'web'
 
 urlpatterns = [
     url(r'^$', views.homepage, name='home'),

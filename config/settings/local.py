@@ -48,6 +48,7 @@ CACHES = {
 # django-debug-toolbar
 # ------------------------------------------------------------------------------
 MIDDLEWARE_CLASSES += ('debug_toolbar.middleware.DebugToolbarMiddleware',)
+MIDDLEWARE = MIDDLEWARE_CLASSES
 INSTALLED_APPS += ('debug_toolbar', )
 
 INTERNAL_IPS = ('127.0.0.1', '10.0.2.2',)
@@ -73,3 +74,5 @@ CELERY_ALWAYS_EAGER = True
 ########## END CELERY
 
 # Your local stuff: Below this line define 3rd party library settings
+ALLOWED_HOSTS = ["elsantodel90.tk"]
+CSRF_TRUSTED_ORIGINS = ['http://rango.elsantodel90.tk']

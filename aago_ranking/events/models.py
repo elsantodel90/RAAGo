@@ -4,7 +4,7 @@ import logging
 
 from django.core.exceptions import ValidationError
 from django.db import models
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from model_utils.models import TimeStampedModel
 
@@ -91,8 +91,8 @@ _RANKING_CHOICES = (
 
 
 class EventPlayer(models.Model):
-    event = models.ForeignKey('Event', editable=False)
-    player = models.ForeignKey('games.Player')
+    event = models.ForeignKey('Event', editable=False,on_delete=models.CASCADE,)
+    player = models.ForeignKey('games.Player',on_delete=models.CASCADE,)
     ranking = models.CharField(max_length=4, choices=_RANKING_CHOICES)
 
     def save(self, *args, **kwargs):

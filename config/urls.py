@@ -2,14 +2,16 @@
 from __future__ import unicode_literals
 
 from django.conf import settings
-from django.conf.urls import include, url
+from django.urls import include
+from django.urls import re_path as url
 from django.conf.urls.static import static
 from django.contrib import admin
 from django.views import defaults as default_views
 
 urlpatterns = [
     # Django Admin, use {% url 'admin:index' %}
-    url(settings.ADMIN_URL, include(admin.site.urls)),
+    #url(settings.ADMIN_URL, include(admin.site.urls)),
+    url(settings.ADMIN_URL, admin.site.urls),
 
     # User management
     url(r'^users/', include('aago_ranking.users.urls', namespace='users')),
